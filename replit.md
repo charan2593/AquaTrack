@@ -1,6 +1,6 @@
 # Overview
 
-AquaFlow is a comprehensive water purifier service management system built with Angular, Node.js/Express, and PostgreSQL. The application provides a complete solution for managing water purifier services, customer data, inventory tracking, and business operations. It features a modern web interface with real-time dashboard analytics, customer management, service scheduling, rent collection tracking, and inventory management capabilities with username/password authentication.
+AquaFlow is a comprehensive water purifier service management system built with React, Express, and PostgreSQL. The application provides a complete solution for managing water purifier services, customer data, inventory tracking, and business operations. It features a modern web interface with real-time dashboard analytics, customer management, service scheduling, rent collection tracking, and inventory management capabilities.
 
 # User Preferences
 
@@ -9,9 +9,9 @@ Preferred communication style: Simple, everyday language.
 # System Architecture
 
 ## Frontend Architecture
-The client-side application is built using Angular 18+ with TypeScript and follows a component-based architecture with standalone components. The UI implements a custom winter-themed design system with consistent styling across the application. The application employs Angular Router for client-side routing and HttpClient for API communications with interceptors for authentication.
+The client-side application is built using React 18 with TypeScript and follows a component-based architecture. The UI layer utilizes shadcn/ui components built on top of Radix UI primitives, providing a consistent and accessible design system. The application employs Wouter for client-side routing, offering a lightweight alternative to React Router. State management is handled through TanStack Query (React Query) for server state synchronization and caching, eliminating the need for complex global state management solutions.
 
-The frontend implements a responsive design using CSS custom properties with a custom winter-themed color palette. Chart.js is integrated for data visualization, providing interactive charts for dashboard analytics and reporting. The application structure follows Angular's recommended patterns with services, guards, and interceptors for cross-cutting concerns.
+The frontend implements a responsive design using Tailwind CSS with a custom winter-themed color palette. Chart.js is integrated for data visualization, providing interactive charts for dashboard analytics and reporting. The application structure follows a feature-based organization with shared components, hooks, and utilities.
 
 ## Backend Architecture
 The server-side follows a RESTful API architecture built with Express.js and TypeScript. The application uses a layered architecture pattern with clear separation between routes, business logic (storage layer), and data access. Authentication is implemented using Replit's OpenID Connect integration with Passport.js, providing secure user authentication and session management.
@@ -24,9 +24,9 @@ PostgreSQL serves as the primary database, chosen for its reliability and suppor
 Database migrations are managed through Drizzle Kit, ensuring consistent schema evolution across environments. Connection pooling is implemented using Neon's serverless PostgreSQL driver, optimizing performance and connection management.
 
 ## Authentication and Authorization
-The application implements JWT-based authentication with username/password credentials. User credentials are securely hashed using bcryptjs and stored in PostgreSQL. The system supports multiple user roles (admin, manager, technician) with role-based access controls implemented at both the API and UI levels.
+The application implements role-based authentication using Replit's OAuth 2.0 / OpenID Connect provider. User sessions are stored in PostgreSQL using connect-pg-simple, providing persistent session management. The system supports multiple user roles (admin, manager, technician) with role-based access controls implemented at both the API and UI levels.
 
-JWT tokens are used for session management with automatic token validation through HTTP interceptors. Authentication state is managed client-side through Angular services with guards protecting routes that require authentication.
+Passport.js handles the OAuth flow with automatic user profile synchronization. Authentication state is managed client-side through React Query with automatic token refresh and logout handling.
 
 ## External Dependencies
 - **Neon Database**: Serverless PostgreSQL hosting with connection pooling

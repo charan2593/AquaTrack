@@ -33,7 +33,7 @@ export function getDatabaseConfig(): DatabaseConfig {
   } else {
     // For development: Use DATABASE_URL from .env or fallback to Neon
     databaseUrl = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_eF4ZaH7sMqgp@ep-polished-math-af7yzbh8.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require';
-    sessionSecret = process.env.SESSION_SECRET || 'dev-secret-key';
+    sessionSecret = process.env.SESSION_SECRET || 'aquaflow-dev-session-secret-key-' + Math.random().toString(36).substring(2, 15);
     
     if (!databaseUrl) {
       console.error('DATABASE_URL not found in environment variables');

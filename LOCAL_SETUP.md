@@ -21,7 +21,6 @@
    NODE_ENV=development
    PORT=3001
    DATABASE_URL=postgresql://username:password@hostname:port/database_name?sslmode=require
-   SESSION_SECRET=aquaflow-dev-secret-key-12345
    ```
    
    **Option B: Use Existing Neon Database (With demo data)**
@@ -29,8 +28,9 @@
    NODE_ENV=development
    PORT=3001
    DATABASE_URL=postgresql://neondb_owner:npg_eF4ZaH7sMqgp@ep-polished-math-af7yzbh8.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require
-   SESSION_SECRET=aquaflow-dev-secret-key-12345
    ```
+   
+   **Note:** SESSION_SECRET is optional - the system will auto-generate one if not provided.
 
 4. **Database Setup:**
    ```bash
@@ -112,7 +112,6 @@ DATABASE_URL=postgresql://aquaflow_user:MyPassword123@postgresql.hostinger.com:5
 NODE_ENV=development
 PORT=3001
 DATABASE_URL=postgresql://your_username:your_password@your_host:5432/your_database?sslmode=require
-SESSION_SECRET=aquaflow-dev-secret-key-12345
 ```
 
 ### Step 4: Initialize Your Database

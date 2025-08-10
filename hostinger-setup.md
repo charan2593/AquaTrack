@@ -20,7 +20,6 @@ Create/update your `.env` file with your Hostinger details:
 NODE_ENV=development
 PORT=3001
 DATABASE_URL=postgresql://username:password@hostname:port/database_name?sslmode=require
-SESSION_SECRET=aquaflow-hostinger-secret-key-12345
 ```
 
 **Real Example:**
@@ -28,8 +27,9 @@ SESSION_SECRET=aquaflow-hostinger-secret-key-12345
 NODE_ENV=development
 PORT=3001
 DATABASE_URL=postgresql://aquaflow_user:MySecurePassword123@postgresql.hostinger.com:5432/aquaflow_production?sslmode=require
-SESSION_SECRET=aquaflow-hostinger-secret-key-12345
 ```
+
+**Note:** SESSION_SECRET is optional - the system automatically generates a secure session secret if not provided.
 
 ### 3. Initialize Database Tables
 ```bash

@@ -31,7 +31,8 @@ export function getDatabaseConfig(): DatabaseConfig {
       console.warn('[Warning] PRODUCTION_SESSION_SECRET not set, using fallback');
     }
   } else {
-    databaseUrl = process.env.DATABASE_URL || '';
+    // Use fallback database URL for local development
+    databaseUrl = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_eF4ZaH7sMqgp@ep-polished-math-af7yzbh8.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require';
     sessionSecret = process.env.SESSION_SECRET || 'dev-secret-key';
     
     if (!databaseUrl) {

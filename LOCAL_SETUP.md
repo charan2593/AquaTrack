@@ -17,11 +17,12 @@
    Create a `.env` file in the root directory with:
    ```env
    NODE_ENV=development
+   PORT=3001
    DATABASE_URL=postgresql://neondb_owner:npg_eF4ZaH7sMqgp@ep-polished-math-af7yzbh8.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require
-   SESSION_SECRET=your-secret-key-here-replace-with-random-string
+   SESSION_SECRET=aquaflow-dev-secret-key-12345
    ```
    
-   **Important:** Replace the DATABASE_URL with the correct password. The current one shown above is the working connection string from this Replit environment.
+   **Note:** The PORT is set to 3001 to avoid conflicts with other local services. The DATABASE_URL connects to the Neon database with all existing data.
 
 4. **Database Setup:**
    ```bash
@@ -34,24 +35,24 @@
    
    **For Windows (Command Prompt):**
    ```cmd
-   set NODE_ENV=development && npx tsx server/index.ts
+   set NODE_ENV=development && set PORT=3001 && npx tsx server/index.ts
    ```
    
    **For Windows (PowerShell):**
    ```powershell
-   $env:NODE_ENV="development"; npx tsx server/index.ts
+   $env:NODE_ENV="development"; $env:PORT="3001"; npx tsx server/index.ts
    ```
    
    **For Mac/Linux:**
    ```bash
-   NODE_ENV=development npx tsx server/index.ts
+   NODE_ENV=development PORT=3001 npx tsx server/index.ts
    ```
    
-   **Alternative (works on all platforms):**
+   **Easiest (with .env file):**
    ```bash
    npx tsx server/index.ts
    ```
-   (The server will default to development mode)
+   (Reads PORT and other settings from .env file automatically)
 
 ## Available Scripts
 - `npm run dev` - Start development server (both frontend and backend)
@@ -60,8 +61,8 @@
 - `npm run db:studio` - Open database studio
 
 ## Access Points
-- Frontend: http://localhost:5000
-- Backend API: http://localhost:5000/api
+- Frontend: http://localhost:3001 (or whatever PORT you set in .env)
+- Backend API: http://localhost:3001/api
 
 ## Test Accounts
 - Admin: Mobile 8500095021, Password: password

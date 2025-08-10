@@ -42,17 +42,11 @@ export const users = pgTable("users", {
 export const customers = pgTable("customers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: varchar("name").notNull(),
-  phone: varchar("phone", { length: 10 }).notNull(),
-  phoneVerified: boolean("phone_verified").notNull().default(false),
-  doorNo: varchar("door_no").notNull(),
-  address1: varchar("address_1").notNull(),
-  address2: varchar("address_2"), // locality
-  city: varchar("city").notNull(),
-  state: varchar("state").notNull(),
-  pincode: varchar("pincode", { length: 6 }).notNull(),
-  serviceType: varchar("service_type").notNull(), // Rental, Retail, AMC
-  productType: varchar("product_type").notNull(), // Aqua Fresh_Type1, Fonix, Aqua Fresh_Type2
-  status: varchar("status").notNull().default('Active'), // Active, Inactive
+  email: varchar("email"),
+  phone: varchar("phone").notNull(),
+  address: text("address").notNull(),
+  serviceType: varchar("service_type").notNull(), // rental, amc, purchase
+  status: varchar("status").notNull().default('active'), // active, inactive, suspended
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -141,20 +135,11 @@ export const insertUserSchema = createInsertSchema(users).omit({
   updatedAt: true,
 });
 
-// Zod schemas for validation
-export const insertCustomerSchema = createInsertSchema(customers, {
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  phone: z.string().regex(/^[6-9]\d{9}$/, "Invalid Indian mobile number"),
-  doorNo: z.string().min(1, "Door number is required"),
-  address1: z.string().min(3, "Address line 1 must be at least 3 characters"),
-  address2: z.string().optional(),
-  city: z.string().min(2, "City must be at least 2 characters"),
-  state: z.string().min(2, "State must be at least 2 characters"),
-  pincode: z.string().regex(/^\d{6}$/, "Pincode must be 6 digits"),
-  serviceType: z.enum(["Rental", "Retail", "AMC"]),
-  productType: z.enum(["Aqua Fresh_Type1", "Fonix", "Aqua Fresh_Type2"]),
-  status: z.enum(["Active", "Inactive"]).default("Active"),
-}).omit({ id: true, createdAt: true, updatedAt: true, phoneVerified: true });
+export const insertCustomerSchema = createInsertSchema(customers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 
 export const insertServiceSchema = createInsertSchema(services).omit({
   id: true,

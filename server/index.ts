@@ -1,6 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { log } from "./vite";
+import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 app.use(express.json());
@@ -47,47 +47,13 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // Setup Angular client serving
-  const path = await import("path");
-  const fs = await import("fs");
-  const angularDistPath = path.join(process.cwd(), "angular-client", "dist", "angular");
-  
-  // Check if we have a built Angular app to serve
-  if (fs.existsSync(angularDistPath)) {
-    console.log("[Angular] Serving built Angular app from:", angularDistPath);
-    app.use(express.static(angularDistPath));
-    
-    // Handle Angular routing - serve index.html for all non-API routes
-    app.get("*", (req, res, next) => {
-      if (req.path.startsWith("/api")) {
-        return next();
-      }
-      res.sendFile(path.join(angularDistPath, "index.html"));
-    });
+  // importantly only setup vite in development and after
+  // setting up all the other routes so the catch-all route
+  // doesn't interfere with the other routes
+  if (app.get("env") === "development") {
+    await setupVite(app, server);
   } else {
-    console.log("[Angular] No built app found, serving development info page");
-    // Fallback to info page if no built app exists
-    app.get("*", (req, res, next) => {
-      if (req.path.startsWith("/api")) {
-        return next();
-      }
-      
-      res.send(`
-        <html>
-          <head><title>AquaFlow - Angular Development</title></head>
-          <body style="font-family: Arial, sans-serif; padding: 40px; text-align: center;">
-            <h1>AquaFlow - Angular Client</h1>
-            <p>No built Angular app found.</p>
-            <p>To start the Angular development server, run:</p>
-            <code style="background: #f0f0f0; padding: 10px; display: block; margin: 20px; border-radius: 4px;">
-              cd angular-client && ng serve --proxy-config proxy.conf.json
-            </code>
-            <p>Or the built Angular app will be served automatically when available.</p>
-            <p>API server is running on port 5000</p>
-          </body>
-        </html>
-      `);
-    });
+    serveStatic(app);
   }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT

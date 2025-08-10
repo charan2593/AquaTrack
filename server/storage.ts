@@ -235,16 +235,16 @@ export class DatabaseStorage implements IStorage {
     const activeResult = await db
       .select({ count: sql<number>`count(*)` })
       .from(customers)
-      .where(eq(customers.status, 'Active'));
+      .where(eq(customers.status, 'active'));
     const inactiveResult = await db
       .select({ count: sql<number>`count(*)` })
       .from(customers)
-      .where(eq(customers.status, 'Inactive'));
+      .where(eq(customers.status, 'inactive'));
 
     return {
-      total: Number(totalResult[0]?.count) || 0,
-      active: Number(activeResult[0]?.count) || 0,
-      inactive: Number(inactiveResult[0]?.count) || 0,
+      total: totalResult[0]?.count || 0,
+      active: activeResult[0]?.count || 0,
+      inactive: inactiveResult[0]?.count || 0,
     };
   }
 

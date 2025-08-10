@@ -21,7 +21,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Customer routes
-  app.get('/api/customers', async (req, res) => {
+  app.get('/api/customers', isAuthenticated, async (req, res) => {
     try {
       const customers = await storage.getCustomers();
       res.json(customers);
@@ -31,7 +31,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/customers/stats', async (req, res) => {
+  app.get('/api/customers/stats', isAuthenticated, async (req, res) => {
     try {
       const stats = await storage.getCustomerStats();
       res.json(stats);
@@ -41,7 +41,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/customers', async (req, res) => {
+  app.post('/api/customers', isAuthenticated, async (req, res) => {
     try {
       const customerData = insertCustomerSchema.parse(req.body);
       const customer = await storage.createCustomer(customerData);
@@ -56,7 +56,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/customers/:id', async (req, res) => {
+  app.put('/api/customers/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
       const customerData = insertCustomerSchema.partial().parse(req.body);
@@ -72,7 +72,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/customers/:id', async (req, res) => {
+  app.delete('/api/customers/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteCustomer(id);

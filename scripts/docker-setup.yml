@@ -1,0 +1,66 @@
+# Docker Compose file for local development
+# Run with: docker-compose -f scripts/docker-setup.yml up -d
+
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: aquaflow-postgres
+    environment:
+      POSTGRES_DB: aquaflow_dev
+      POSTGRES_USER: aquaflow_user
+      POSTGRES_PASSWORD: aquaflow_dev_password
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aquaflow_user -d aquaflow_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Optional: pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: aquaflow-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@aquaflow.local
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles:
+      - tools
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+# Usage:
+# 1. Start PostgreSQL only:
+#    docker-compose -f scripts/docker-setup.yml up -d postgres
+#
+# 2. Start PostgreSQL + pgAdmin:
+#    docker-compose -f scripts/docker-setup.yml --profile tools up -d
+#
+# 3. Stop services:
+#    docker-compose -f scripts/docker-setup.yml down
+#
+# 4. Reset data (remove volumes):
+#    docker-compose -f scripts/docker-setup.yml down -v
+#
+# After starting, use this connection string in your .env:
+# DATABASE_URL=postgresql://aquaflow_user:aquaflow_dev_password@localhost:5432/aquaflow_dev

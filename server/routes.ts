@@ -208,8 +208,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Inventory routes
-  app.get('/api/inventory/categories', isAuthenticated, async (req, res) => {
+  app.get('/api/inventory/categories', isAuthenticated, async (req: any, res) => {
     try {
+      // Check if user has access to inventory (not manager)
+      if (req.user?.role === 'manager') {
+        return res.status(403).json({ message: "Access denied. Managers cannot access inventory." });
+      }
+      
       const categories = await storage.getInventoryCategories();
       res.json(categories);
     } catch (error) {
@@ -218,8 +223,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/inventory/items', isAuthenticated, async (req, res) => {
+  app.get('/api/inventory/items', isAuthenticated, async (req: any, res) => {
     try {
+      // Check if user has access to inventory (not manager)
+      if (req.user?.role === 'manager') {
+        return res.status(403).json({ message: "Access denied. Managers cannot access inventory." });
+      }
+      
       const items = await storage.getInventoryItems();
       res.json(items);
     } catch (error) {
@@ -228,8 +238,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/inventory/items/category/:categoryId', isAuthenticated, async (req, res) => {
+  app.get('/api/inventory/items/category/:categoryId', isAuthenticated, async (req: any, res) => {
     try {
+      // Check if user has access to inventory (not manager)
+      if (req.user?.role === 'manager') {
+        return res.status(403).json({ message: "Access denied. Managers cannot access inventory." });
+      }
+      
       const { categoryId } = req.params;
       const items = await storage.getInventoryItemsByCategory(categoryId);
       res.json(items);
@@ -239,8 +254,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/inventory/items', isAuthenticated, async (req, res) => {
+  app.post('/api/inventory/items', isAuthenticated, async (req: any, res) => {
     try {
+      // Check if user has access to inventory (not manager)
+      if (req.user?.role === 'manager') {
+        return res.status(403).json({ message: "Access denied. Managers cannot access inventory." });
+      }
+      
       const itemData = insertInventoryItemSchema.parse(req.body);
       const item = await storage.createInventoryItem(itemData);
       res.status(201).json(item);

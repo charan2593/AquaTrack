@@ -24,9 +24,13 @@ PostgreSQL serves as the primary database with separate development and producti
 Database migrations are managed through Drizzle Kit with environment-aware configuration. Connection pooling is implemented using Neon's serverless PostgreSQL driver with optimized settings per environment (dev: 1-5 connections, prod: 2-10 connections). The system automatically validates environment configuration on startup and provides comprehensive logging.
 
 ## Authentication and Authorization
-The application implements role-based authentication using traditional username/password credentials with bcrypt hashing. User sessions are stored in PostgreSQL using connect-pg-simple, providing persistent session management. The system supports multiple user roles (admin, manager, technician) with role-based access controls implemented at both the API and UI levels.
+The application implements role-based authentication using mobile number/password credentials with scrypt hashing for enhanced security. User sessions are stored in PostgreSQL using connect-pg-simple, providing persistent session management. The system supports multiple user roles (admin, manager, service boy) with comprehensive role-based access controls:
 
-Express.js with Passport.js local strategy handles authentication flow. Authentication state is managed client-side through Angular services with RxJS observables and HTTP interceptors for automatic session management.
+- **Admin**: Full access to all features including User Management and Inventory Dashboard
+- **Manager**: Access to Service Management features but restricted from User Management and Inventory Dashboard  
+- **Service Boy**: Access to Service Management and Inventory Dashboard but no User Management access
+
+Express.js with Passport.js local strategy handles authentication flow. Role-based restrictions are implemented at both API endpoints (403 forbidden responses) and UI level (menu items hidden based on user role). All user creation is admin-managed with no public registration.
 
 ## External Dependencies
 - **Neon Database**: Serverless PostgreSQL hosting with connection pooling

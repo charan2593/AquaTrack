@@ -86,7 +86,8 @@ export default function Sidebar() {
         }
       ]
     },
-    {
+    // Show Inventory only to admins and service boys (not managers)
+    ...(user?.role !== 'manager' ? [{
       title: "Inventory",
       items: [
         {
@@ -96,7 +97,7 @@ export default function Sidebar() {
           testId: "nav-inventory"
         }
       ]
-    }
+    }] : [])
   ];
 
   const isActive = (href: string) => {

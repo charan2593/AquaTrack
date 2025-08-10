@@ -7,6 +7,7 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
+import { getDatabaseConfig } from "./config/database.js";
 
 declare global {
   namespace Express {
@@ -30,24 +31,30 @@ async function comparePasswords(supplied: string, stored: string): Promise<boole
 }
 
 export function setupAuth(app: Express) {
+  // Get environment-aware database configuration
+  const dbConfig = getDatabaseConfig();
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
+  
+  console.log(`[Auth] Setting up authentication for ${dbConfig.environment} environment`);
+  
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
-    conString: process.env.DATABASE_URL,
+    conString: dbConfig.databaseUrl,
     createTableIfMissing: true,
     ttl: sessionTtl,
     tableName: "sessions",
   });
 
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    secret: dbConfig.sessionSecret,
     resave: false,
     saveUninitialized: false,
     store: sessionStore,
     cookie: {
       httpOnly: true,
-      secure: false, // Set to true in production with HTTPS
+      secure: dbConfig.environment === 'production', // Enable secure cookies in production
       maxAge: sessionTtl,
+      sameSite: dbConfig.environment === 'production' ? 'strict' : 'lax',
     },
   };
 

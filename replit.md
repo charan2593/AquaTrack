@@ -9,9 +9,9 @@ Preferred communication style: Simple, everyday language.
 # System Architecture
 
 ## Frontend Architecture
-The client-side application is built using React 18 with TypeScript and follows a component-based architecture. The UI layer utilizes shadcn/ui components built on top of Radix UI primitives, providing a consistent and accessible design system. The application employs Wouter for client-side routing, offering a lightweight alternative to React Router. State management is handled through TanStack Query (React Query) for server state synchronization and caching, eliminating the need for complex global state management solutions.
+The client-side application is being migrated from React to Angular 17+ with TypeScript following a component-based architecture. The UI layer utilizes Angular Material components providing a consistent and accessible design system with Material Design 3 principles. The application employs Angular Router for client-side routing with lazy loading and guards for authentication. State management is handled through Angular services and RxJS observables for reactive programming patterns.
 
-The frontend implements a responsive design using Tailwind CSS with a custom winter-themed color palette. Chart.js is integrated for data visualization, providing interactive charts for dashboard analytics and reporting. The application structure follows a feature-based organization with shared components, hooks, and utilities.
+The frontend implements a responsive design using Angular Material themes with a custom winter-themed color palette. Chart.js is integrated for data visualization, providing interactive charts for dashboard analytics and reporting. The application structure follows Angular's recommended organization with standalone components, services, and feature modules.
 
 ## Backend Architecture
 The server-side follows a RESTful API architecture built with Express.js and TypeScript. The application uses a layered architecture pattern with clear separation between routes, business logic (storage layer), and data access. Authentication is implemented using Replit's OpenID Connect integration with Passport.js, providing secure user authentication and session management.
@@ -24,18 +24,17 @@ PostgreSQL serves as the primary database, chosen for its reliability and suppor
 Database migrations are managed through Drizzle Kit, ensuring consistent schema evolution across environments. Connection pooling is implemented using Neon's serverless PostgreSQL driver, optimizing performance and connection management.
 
 ## Authentication and Authorization
-The application implements role-based authentication using Replit's OAuth 2.0 / OpenID Connect provider. User sessions are stored in PostgreSQL using connect-pg-simple, providing persistent session management. The system supports multiple user roles (admin, manager, technician) with role-based access controls implemented at both the API and UI levels.
+The application implements role-based authentication using traditional username/password credentials with bcrypt hashing. User sessions are stored in PostgreSQL using connect-pg-simple, providing persistent session management. The system supports multiple user roles (admin, manager, technician) with role-based access controls implemented at both the API and UI levels.
 
-Passport.js handles the OAuth flow with automatic user profile synchronization. Authentication state is managed client-side through React Query with automatic token refresh and logout handling.
+Express.js with Passport.js local strategy handles authentication flow. Authentication state is managed client-side through Angular services with RxJS observables and HTTP interceptors for automatic session management.
 
 ## External Dependencies
 - **Neon Database**: Serverless PostgreSQL hosting with connection pooling
-- **Replit Authentication**: OAuth 2.0 / OpenID Connect provider for user authentication
-- **Radix UI**: Headless component library for accessible UI primitives
+- **Express.js**: Backend API server with custom username/password authentication
+- **Angular Material**: Material Design component library for Angular
 - **Chart.js**: Data visualization library for dashboard charts and analytics
-- **Tailwind CSS**: Utility-first CSS framework for responsive design
-- **shadcn/ui**: Pre-built component library built on Radix UI and Tailwind
-- **TanStack Query**: Server state management and data synchronization
+- **RxJS**: Reactive programming library for Angular services and HTTP client
+- **Angular CLI**: Build and development toolchain for Angular applications
 - **Drizzle ORM**: Type-safe database ORM with PostgreSQL support
 
 The application follows a monorepo structure with shared TypeScript definitions, enabling type safety across the full stack. Build tooling includes Vite for frontend bundling with ESBuild for backend compilation, providing fast development and production builds.

@@ -1,0 +1,140 @@
+/* Winter chill theme colors */
+:root {
+  --winter-primary: 44 80% 58%; /* Light blue */
+  --winter-secondary: 190 81% 67%; /* Cyan */
+  --winter-accent: 220 100% 78%; /* Light blue accent */
+  --winter-light: 200 100% 95%; /* Very light blue */
+  --winter-dark: 220 45% 15%; /* Dark blue-gray */
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, 
+    hsl(var(--winter-light)) 0%, 
+    hsl(var(--winter-secondary) / 0.1) 100%);
+  min-height: 100vh;
+}
+
+.winter-gradient {
+  background: linear-gradient(135deg, 
+    hsl(var(--winter-light)) 0%, 
+    hsl(var(--winter-secondary)) 100%);
+}
+
+.winter-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.winter-sidebar {
+  background: linear-gradient(180deg, 
+    hsl(var(--winter-dark)) 0%, 
+    hsl(var(--winter-dark) / 0.95) 100%);
+  color: white;
+}
+
+.mat-mdc-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.mat-mdc-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+.mat-toolbar.mat-primary {
+  background: linear-gradient(90deg, 
+    hsl(var(--winter-primary)) 0%, 
+    hsl(var(--winter-secondary)) 100%);
+}
+
+.winter-stat-card {
+  background: linear-gradient(135deg, 
+    hsl(var(--winter-primary) / 0.1) 0%, 
+    hsl(var(--winter-secondary) / 0.05) 100%);
+  border-left: 4px solid hsl(var(--winter-primary));
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--winter-light));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--winter-primary));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--winter-secondary));
+}
+
+/* Form field customizations */
+.mat-mdc-form-field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.mat-mdc-text-field-wrapper {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+}
+
+/* Table customizations */
+.mat-mdc-table {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+}
+
+.mat-mdc-header-row {
+  background: hsl(var(--winter-light));
+}
+
+.mat-mdc-row:hover {
+  background: hsl(var(--winter-light) / 0.5);
+}
+
+/* Button customizations */
+.mat-mdc-fab.mat-primary,
+.mat-mdc-raised-button.mat-primary {
+  background: linear-gradient(45deg, 
+    hsl(var(--winter-primary)) 0%, 
+    hsl(var(--winter-secondary)) 100%);
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+/* Utility classes */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.mb-16 { margin-bottom: 16px; }
+.mt-16 { margin-top: 16px; }
+.p-16 { padding: 16px; }
+.full-width { width: 100%; }

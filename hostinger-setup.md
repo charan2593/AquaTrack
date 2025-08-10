@@ -1,0 +1,142 @@
+# Hostinger Database Setup Guide
+
+## Quick Setup for Hostinger PostgreSQL
+
+### 1. Get Your Database Credentials from Hostinger
+1. Log into your Hostinger control panel
+2. Go to "Databases" section
+3. Create a new PostgreSQL database (if you haven't already)
+4. Note down these details:
+   - **Host:** Usually `postgresql.hostinger.com` or similar
+   - **Port:** Usually `5432`
+   - **Database Name:** Your chosen database name
+   - **Username:** Your database username
+   - **Password:** Your database password
+
+### 2. Update Your .env File
+Create/update your `.env` file with your Hostinger details:
+
+```env
+NODE_ENV=development
+PORT=3001
+DATABASE_URL=postgresql://username:password@hostname:port/database_name?sslmode=require
+SESSION_SECRET=aquaflow-hostinger-secret-key-12345
+```
+
+**Real Example:**
+```env
+NODE_ENV=development
+PORT=3001
+DATABASE_URL=postgresql://aquaflow_user:MySecurePassword123@postgresql.hostinger.com:5432/aquaflow_production?sslmode=require
+SESSION_SECRET=aquaflow-hostinger-secret-key-12345
+```
+
+### 3. Initialize Database Tables
+```bash
+npm run db:push
+```
+
+This creates all required tables in your empty Hostinger database:
+- users (authentication)
+- customers (customer data)
+- services (service records)
+- rent_dues (monthly rent tracking)
+- purchases (AMC/purifier purchases)
+- inventory (product inventory)
+- sessions (user sessions)
+
+### 4. Create Your First Admin User
+
+**Method A: Direct API Call**
+```bash
+curl -X POST http://localhost:3001/api/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mobile": "8500095021",
+    "password": "password",
+    "name": "Admin User",
+    "role": "admin"
+  }'
+```
+
+**Method B: Database Client (phpMyAdmin, pgAdmin, etc.)**
+```sql
+INSERT INTO users (mobile, password, name, role, created_at) 
+VALUES (
+  '8500095021', 
+  '$2b$10$rBTLQHYrOb5JEIKgwKNBFOCYgCzWJSBV6FZkfXPwOZgYGKfmDNz4m',  -- This is "password" hashed
+  'Admin User', 
+  'admin',
+  NOW()
+);
+```
+
+### 5. Start Your Application
+```bash
+npx tsx server/index.ts
+```
+
+Visit: http://localhost:3001
+
+**Login Credentials:**
+- Mobile: 8500095021
+- Password: password
+
+### 6. Create Additional Users
+Once logged in as admin, you can create more users through the User Management page:
+- **Manager Users:** Can access Service Management
+- **Service Boy Users:** Read-only access to Dashboard and Today's Services
+
+## SSL/TLS Configuration
+
+If you get SSL errors, try these connection string variations:
+
+**Option 1: Require SSL**
+```
+postgresql://username:password@hostname:port/database_name?sslmode=require
+```
+
+**Option 2: Disable SSL (if Hostinger doesn't support it)**
+```
+postgresql://username:password@hostname:port/database_name?sslmode=disable
+```
+
+**Option 3: Prefer SSL**
+```
+postgresql://username:password@hostname:port/database_name?sslmode=prefer
+```
+
+## Common Hostinger Database Hosts
+- `postgresql.hostinger.com`
+- `cpdb-{region}.hostinger.com`
+- Direct IP addresses (check your control panel)
+
+## Troubleshooting
+
+### Connection Refused
+- Check if your host/port are correct
+- Verify your database is running
+- Check Hostinger firewall settings
+
+### Authentication Failed
+- Double-check username and password
+- Make sure the user has access to the database
+- Try connecting with a database client first
+
+### SSL Errors
+- Try different sslmode options (require, disable, prefer)
+- Check if Hostinger supports SSL connections
+
+### Permission Denied
+- Ensure your database user has CREATE, INSERT, UPDATE, DELETE permissions
+- Check if the database exists and is accessible
+
+## Migration from Demo Database
+
+If you want to copy existing data from the demo Neon database to your Hostinger database:
+
+1. First, set up your Hostinger database (steps 1-3 above)
+2. Export data from Neon database
+3. Import data to Hostinger database
+
+This would require additional setup - let me know if you need help with data migration.

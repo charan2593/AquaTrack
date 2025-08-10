@@ -15,21 +15,32 @@
 
 3. **Environment Configuration:**
    Create a `.env` file in the root directory with:
+   
+   **Option A: Use Hostinger Database (Recommended for your own data)**
+   ```env
+   NODE_ENV=development
+   PORT=3001
+   DATABASE_URL=postgresql://username:password@hostname:port/database_name?sslmode=require
+   SESSION_SECRET=aquaflow-dev-secret-key-12345
+   ```
+   
+   **Option B: Use Existing Neon Database (With demo data)**
    ```env
    NODE_ENV=development
    PORT=3001
    DATABASE_URL=postgresql://neondb_owner:npg_eF4ZaH7sMqgp@ep-polished-math-af7yzbh8.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require
    SESSION_SECRET=aquaflow-dev-secret-key-12345
    ```
-   
-   **Note:** The PORT is set to 3001 to avoid conflicts with other local services. The DATABASE_URL connects to the Neon database with all existing data.
 
 4. **Database Setup:**
    ```bash
    npm run db:push
    ```
    
-   **Note:** If you get authentication errors, make sure your `.env` file has the correct DATABASE_URL with the right password. The database is already set up on Neon, so this step just ensures your schema is current.
+   **Important Notes:**
+   - **For Hostinger Database:** This command will create all the required tables in your empty database
+   - **For Neon Database:** The tables already exist, so this just ensures your schema is current
+   - If you get authentication errors, double-check your DATABASE_URL connection string
 
 5. **Start the development server:**
    
@@ -74,6 +85,77 @@
 - Frontend and backend are served from the same port
 - Hot reloading is enabled for both frontend and backend
 - Database connections use connection pooling for development
+
+## Connecting to Your Hostinger Database
+
+### Step 1: Get Your Hostinger Database Details
+Log into your Hostinger control panel and find these details:
+- **Host/Server:** Usually something like `postgresql.hostinger.com` or an IP address
+- **Port:** Usually `5432` (default PostgreSQL port)
+- **Database Name:** Your database name
+- **Username:** Your database username
+- **Password:** Your database password
+
+### Step 2: Create the Connection String
+Replace the placeholders in this format:
+```
+postgresql://username:password@hostname:port/database_name?sslmode=require
+```
+
+**Example:**
+```
+DATABASE_URL=postgresql://aquaflow_user:MyPassword123@postgresql.hostinger.com:5432/aquaflow_db?sslmode=require
+```
+
+### Step 3: Update Your .env File
+```env
+NODE_ENV=development
+PORT=3001
+DATABASE_URL=postgresql://your_username:your_password@your_host:5432/your_database?sslmode=require
+SESSION_SECRET=aquaflow-dev-secret-key-12345
+```
+
+### Step 4: Initialize Your Database
+```bash
+npm run db:push
+```
+
+This will create all the required tables:
+- `users` (for authentication)
+- `customers` (customer management)
+- `services` (service records)
+- `rent_dues` (rent tracking)
+- `purchases` (purchase history)
+- `inventory` (inventory management)
+- `sessions` (user sessions)
+
+### Step 5: Create Admin User
+After the database is set up, you'll need to create an admin user. The system doesn't allow public registration - all users must be created by an admin.
+
+**Option A: Use the API directly**
+```bash
+curl -X POST http://localhost:3001/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"mobile":"8500095021","password":"password","name":"Admin User","role":"admin"}'
+```
+
+**Option B: Use a database client**
+Connect to your Hostinger database and insert directly:
+```sql
+INSERT INTO users (mobile, password, name, role) 
+VALUES ('8500095021', '$scrypt$N$8$1$hashedpassword', 'Admin User', 'admin');
+```
+
+### Step 6: Test the Connection
+Start your server and try logging in:
+```bash
+npx tsx server/index.ts
+```
+Visit: http://localhost:3001
+
+**Login with:**
+- Mobile: 8500095021
+- Password: password
 
 ## Troubleshooting
 

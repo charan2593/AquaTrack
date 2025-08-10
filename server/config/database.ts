@@ -31,14 +31,15 @@ export function getDatabaseConfig(): DatabaseConfig {
       console.warn('[Warning] PRODUCTION_SESSION_SECRET not set, using fallback');
     }
   } else {
-    // Use fallback database URL for local development
+    // For development: Use DATABASE_URL from .env or fallback to Neon
     databaseUrl = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_eF4ZaH7sMqgp@ep-polished-math-af7yzbh8.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require';
     sessionSecret = process.env.SESSION_SECRET || 'dev-secret-key';
     
     if (!databaseUrl) {
+      console.error('DATABASE_URL not found in environment variables');
       throw new Error(
         'DATABASE_URL must be set for development environment. ' +
-        'Please provision a database in your development environment.'
+        'Please add DATABASE_URL to your .env file with your Hostinger database connection string.'
       );
     }
   }

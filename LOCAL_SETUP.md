@@ -27,9 +27,27 @@
    ```
 
 5. **Start the development server:**
-   ```bash
-   npm run dev
+   
+   **For Windows (Command Prompt):**
+   ```cmd
+   set NODE_ENV=development && npx tsx server/index.ts
    ```
+   
+   **For Windows (PowerShell):**
+   ```powershell
+   $env:NODE_ENV="development"; npx tsx server/index.ts
+   ```
+   
+   **For Mac/Linux:**
+   ```bash
+   NODE_ENV=development npx tsx server/index.ts
+   ```
+   
+   **Alternative (works on all platforms):**
+   ```bash
+   npx tsx server/index.ts
+   ```
+   (The server will default to development mode)
 
 ## Available Scripts
 - `npm run dev` - Start development server (both frontend and backend)

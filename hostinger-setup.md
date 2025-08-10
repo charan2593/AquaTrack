@@ -16,17 +16,25 @@
 ### 2. Update Your .env File
 Create/update your `.env` file with your Hostinger details:
 
+**For MySQL (Most Common):**
 ```env
 NODE_ENV=development
 PORT=3001
-DATABASE_URL=postgresql://username:password@hostname:port/database_name?sslmode=require
+DATABASE_URL=mysql://username:password@hostname:port/database_name
 ```
 
-**Real Example:**
+**For PostgreSQL:**
 ```env
 NODE_ENV=development
 PORT=3001
-DATABASE_URL=postgresql://aquaflow_user:MySecurePassword123@postgresql.hostinger.com:5432/aquaflow_production?sslmode=require
+DATABASE_URL=postgresql://username:password@hostname:port/database_name?sslmode=disable
+```
+
+**Real MySQL Example:**
+```env
+NODE_ENV=development
+PORT=3001
+DATABASE_URL=mysql://aquaflow_user:MySecurePassword123@srv1952.hstgr.io:3306/u866935527_aquaflow
 ```
 
 **Note:** SESSION_SECRET is optional - the system automatically generates a secure session secret if not provided.

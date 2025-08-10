@@ -16,14 +16,21 @@
 3. **Environment Configuration:**
    Create a `.env` file in the root directory with:
    
-   **Option A: Use Hostinger Database (Recommended for your own data)**
+   **Option A: Use Hostinger MySQL Database (Recommended for your own data)**
    ```env
    NODE_ENV=development
    PORT=3001
-   DATABASE_URL=postgresql://username:password@hostname:port/database_name?sslmode=require
+   DATABASE_URL=mysql://username:password@hostname:port/database_name
    ```
    
-   **Option B: Use Existing Neon Database (With demo data)**
+   **Option B: Use Hostinger PostgreSQL Database**
+   ```env
+   NODE_ENV=development
+   PORT=3001
+   DATABASE_URL=postgresql://username:password@hostname:port/database_name?sslmode=disable
+   ```
+   
+   **Option C: Use Existing Neon Database (With demo data)**
    ```env
    NODE_ENV=development
    PORT=3001

@@ -47,13 +47,47 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
+  // Setup Angular client serving
+  if (process.env.NODE_ENV === "production") {
+    // Serve built Angular files in production
+    const path = await import("path");
+    const fs = await import("fs");
+    const angularDistPath = path.join(process.cwd(), "angular-client", "dist", "angular");
+    
+    if (fs.existsSync(angularDistPath)) {
+      app.use(express.static(angularDistPath));
+      app.get("*", (req, res, next) => {
+        if (req.path.startsWith("/api")) {
+          return next();
+        }
+        res.sendFile(path.join(angularDistPath, "index.html"));
+      });
+    } else {
+      console.error("[Angular] Build not found. Run 'cd angular-client && ng build' first.");
+    }
   } else {
-    serveStatic(app);
+    // In development, serve info page and let Angular dev server handle the frontend
+    app.get("*", (req, res, next) => {
+      if (req.path.startsWith("/api")) {
+        return next();
+      }
+      
+      res.send(`
+        <html>
+          <head><title>AquaFlow - Angular Development</title></head>
+          <body style="font-family: Arial, sans-serif; padding: 40px; text-align: center;">
+            <h1>AquaFlow - Angular Client</h1>
+            <p>Development mode detected.</p>
+            <p>To start the Angular development server, run:</p>
+            <code style="background: #f0f0f0; padding: 10px; display: block; margin: 20px; border-radius: 4px;">
+              cd angular-client && ng serve --proxy-config proxy.conf.json
+            </code>
+            <p>The Angular app will be available at <a href="http://localhost:3000">http://localhost:3000</a></p>
+            <p>API server is running on port 5000</p>
+          </body>
+        </html>
+      `);
+    });
   }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT

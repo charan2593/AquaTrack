@@ -64,6 +64,11 @@ export function getDatabaseConfig(): DatabaseConfig {
   console.log(`[Database Config] Database URL: ${databaseUrl.replace(/:[^:]*@/, ':***@')}`);
   console.log(`[Database Config] Connection Pool: ${JSON.stringify(config.connectionPool)}`);
 
+  // Test database connection
+  if (databaseUrl.includes('hostinger') || databaseUrl.includes('145.79.209.203')) {
+    console.log('[Database] Detected external database, testing connection...');
+  }
+
   return config;
 }
 

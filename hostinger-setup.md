@@ -87,23 +87,33 @@ Once logged in as admin, you can create more users through the User Management p
 - **Manager Users:** Can access Service Management
 - **Service Boy Users:** Read-only access to Dashboard and Today's Services
 
-## SSL/TLS Configuration
+## Connection String Variations
 
-If you get SSL errors, try these connection string variations:
+Try these different connection string formats if you get connection errors:
 
-**Option 1: Require SSL**
+**Option 1: With SSL (Most Secure)**
 ```
 postgresql://username:password@hostname:port/database_name?sslmode=require
 ```
 
-**Option 2: Disable SSL (if Hostinger doesn't support it)**
+**Option 2: Without SSL (For Compatibility)**
 ```
 postgresql://username:password@hostname:port/database_name?sslmode=disable
 ```
 
-**Option 3: Prefer SSL**
+**Option 3: With Connection Timeout**
 ```
-postgresql://username:password@hostname:port/database_name?sslmode=prefer
+postgresql://username:password@hostname:port/database_name?sslmode=require&connect_timeout=30
+```
+
+**Option 4: Internal Hostinger Network (if available)**
+```
+postgresql://username:password@localhost:5432/database_name?sslmode=disable
+```
+
+**Option 5: Alternative Port (some Hostinger plans use different ports)**
+```
+postgresql://username:password@hostname:3306/database_name?sslmode=disable
 ```
 
 ## Common Hostinger Database Hosts
@@ -113,10 +123,14 @@ postgresql://username:password@hostname:port/database_name?sslmode=prefer
 
 ## Troubleshooting
 
-### Connection Refused
-- Check if your host/port are correct
-- Verify your database is running
-- Check Hostinger firewall settings
+### Connection Refused or Timeout
+- **Check Hostinger Control Panel:** Make sure your database is running
+- **Verify Host/Port:** Double-check the connection details
+- **Firewall Issues:** Hostinger may restrict external connections
+- **Try Alternative Connection Methods:**
+  - Use Hostinger's internal hostname instead of external IP
+  - Check if your hosting plan allows external database connections
+  - Contact Hostinger support to enable external database access
 
 ### Authentication Failed
 - Double-check username and password

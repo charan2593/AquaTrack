@@ -159,10 +159,21 @@ Visit: http://localhost:3001
 ## Troubleshooting
 
 ### Database Connection Issues
+
+**For Neon Database (Demo Data):**
 If you get "password authentication failed" errors:
 1. Make sure your `.env` file has the correct DATABASE_URL
 2. The database is hosted on Neon and already contains all the tables and test user accounts
 3. You can skip `npm run db:push` if you get connection errors - the database is already set up
+
+**For Hostinger Database:**
+If you get connection timeout or refused errors:
+1. **Check Hostinger Settings:** Ensure external connections are enabled
+2. **Try Different Connection Strings:**
+   - `?sslmode=disable` instead of `?sslmode=require`
+   - Use internal hostname if available (check Hostinger control panel)
+   - Some plans use port 3306 instead of 5432
+3. **Contact Hostinger Support:** External database access may need to be enabled
 
 ### Port Conflict Issues
 If you get "EADDRINUSE" or "ENOTUP" port errors:

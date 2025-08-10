@@ -28,7 +28,7 @@ The application implements role-based authentication using mobile number/passwor
 
 - **Admin**: Full access to all features including User Management and Inventory Dashboard
 - **Manager**: Access to Service Management features but restricted from User Management and Inventory Dashboard  
-- **Service Boy**: Access to Service Management and Inventory Dashboard but no User Management access
+- **Service Boy**: Read-only access to Dashboard, Customer List, and Today's Services only (no User Management, Inventory, or financial operations)
 
 Express.js with Passport.js local strategy handles authentication flow. Role-based restrictions are implemented at both API endpoints (403 forbidden responses) and UI level (menu items hidden based on user role). All user creation is admin-managed with no public registration.
 

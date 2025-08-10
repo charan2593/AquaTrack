@@ -66,24 +66,27 @@ export default function Sidebar() {
           icon: Calendar,
           testId: "nav-todays-services"
         },
-        {
-          title: "Rent Dues",
-          href: "/rent-dues",
-          icon: DollarSign,
-          testId: "nav-rent-dues"
-        },
-        {
-          title: "Purifier Purchases",
-          href: "/purifier-purchases",
-          icon: ShoppingCart,
-          testId: "nav-purifier-purchases"
-        },
-        {
-          title: "AMC Purchases",
-          href: "/amc-purchases",
-          icon: FileText,
-          testId: "nav-amc-purchases"
-        }
+        // Hide other service management items from service boys
+        ...(user?.role !== 'service boy' ? [
+          {
+            title: "Rent Dues",
+            href: "/rent-dues",
+            icon: DollarSign,
+            testId: "nav-rent-dues"
+          },
+          {
+            title: "Purifier Purchases",
+            href: "/purifier-purchases",
+            icon: ShoppingCart,
+            testId: "nav-purifier-purchases"
+          },
+          {
+            title: "AMC Purchases",
+            href: "/amc-purchases",
+            icon: FileText,
+            testId: "nav-amc-purchases"
+          }
+        ] : [])
       ]
     },
     // Show Inventory only to admins and service boys (not managers)

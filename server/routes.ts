@@ -41,8 +41,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/customers', isAuthenticated, async (req, res) => {
+  app.post('/api/customers', isAuthenticated, async (req: any, res) => {
     try {
+      // Service boys cannot create customers (read-only access)
+      if (req.user?.role === 'service boy') {
+        return res.status(403).json({ message: "Access denied. Service boys have read-only access to customers." });
+      }
+      
       const customerData = insertCustomerSchema.parse(req.body);
       const customer = await storage.createCustomer(customerData);
       res.status(201).json(customer);
@@ -56,8 +61,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/customers/:id', isAuthenticated, async (req, res) => {
+  app.put('/api/customers/:id', isAuthenticated, async (req: any, res) => {
     try {
+      // Service boys cannot update customers (read-only access)
+      if (req.user?.role === 'service boy') {
+        return res.status(403).json({ message: "Access denied. Service boys have read-only access to customers." });
+      }
+      
       const { id } = req.params;
       const customerData = insertCustomerSchema.partial().parse(req.body);
       const customer = await storage.updateCustomer(id, customerData);
@@ -72,8 +82,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/customers/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/customers/:id', isAuthenticated, async (req: any, res) => {
     try {
+      // Service boys cannot delete customers (read-only access)
+      if (req.user?.role === 'service boy') {
+        return res.status(403).json({ message: "Access denied. Service boys have read-only access to customers." });
+      }
+      
       const { id } = req.params;
       await storage.deleteCustomer(id);
       res.status(204).send();
@@ -104,8 +119,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/services', isAuthenticated, async (req, res) => {
+  app.post('/api/services', isAuthenticated, async (req: any, res) => {
     try {
+      // Service boys cannot create services (read-only access)
+      if (req.user?.role === 'service boy') {
+        return res.status(403).json({ message: "Access denied. Service boys have read-only access to services." });
+      }
+      
       const serviceData = insertServiceSchema.parse(req.body);
       const service = await storage.createService(serviceData);
       res.status(201).json(service);
@@ -120,8 +140,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Rent dues routes
-  app.get('/api/rent-dues', isAuthenticated, async (req, res) => {
+  app.get('/api/rent-dues', isAuthenticated, async (req: any, res) => {
     try {
+      // Service boys cannot access rent dues
+      if (req.user?.role === 'service boy') {
+        return res.status(403).json({ message: "Access denied. Service boys cannot access rent dues." });
+      }
+      
       const rentDues = await storage.getRentDues();
       res.json(rentDues);
     } catch (error) {
@@ -130,8 +155,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/rent-dues/today', isAuthenticated, async (req, res) => {
+  app.get('/api/rent-dues/today', isAuthenticated, async (req: any, res) => {
     try {
+      // Service boys cannot access rent dues
+      if (req.user?.role === 'service boy') {
+        return res.status(403).json({ message: "Access denied. Service boys cannot access rent dues." });
+      }
+      
       const rentDues = await storage.getTodaysRentDues();
       res.json(rentDues);
     } catch (error) {
@@ -157,8 +187,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Purchase routes
-  app.get('/api/purifier-purchases', isAuthenticated, async (req, res) => {
+  app.get('/api/purifier-purchases', isAuthenticated, async (req: any, res) => {
     try {
+      // Service boys cannot access purifier purchases
+      if (req.user?.role === 'service boy') {
+        return res.status(403).json({ message: "Access denied. Service boys cannot access purifier purchases." });
+      }
+      
       const purchases = await storage.getPurifierPurchases();
       res.json(purchases);
     } catch (error) {
@@ -167,8 +202,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/purifier-purchases', isAuthenticated, async (req, res) => {
+  app.post('/api/purifier-purchases', isAuthenticated, async (req: any, res) => {
     try {
+      // Service boys cannot create purifier purchases
+      if (req.user?.role === 'service boy') {
+        return res.status(403).json({ message: "Access denied. Service boys cannot create purifier purchases." });
+      }
+      
       const purchaseData = insertPurifierPurchaseSchema.parse(req.body);
       const purchase = await storage.createPurifierPurchase(purchaseData);
       res.status(201).json(purchase);
@@ -182,8 +222,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/amc-purchases', isAuthenticated, async (req, res) => {
+  app.get('/api/amc-purchases', isAuthenticated, async (req: any, res) => {
     try {
+      // Service boys cannot access AMC purchases
+      if (req.user?.role === 'service boy') {
+        return res.status(403).json({ message: "Access denied. Service boys cannot access AMC purchases." });
+      }
+      
       const purchases = await storage.getAmcPurchases();
       res.json(purchases);
     } catch (error) {
@@ -192,8 +237,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/amc-purchases', isAuthenticated, async (req, res) => {
+  app.post('/api/amc-purchases', isAuthenticated, async (req: any, res) => {
     try {
+      // Service boys cannot create AMC purchases
+      if (req.user?.role === 'service boy') {
+        return res.status(403).json({ message: "Access denied. Service boys cannot create AMC purchases." });
+      }
+      
       const purchaseData = insertAmcPurchaseSchema.parse(req.body);
       const purchase = await storage.createAmcPurchase(purchaseData);
       res.status(201).json(purchase);

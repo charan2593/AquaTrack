@@ -17,10 +17,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'aquaflow-secret-key';
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from Angular dist directory
-const distPath = path.join(__dirname, '..', 'dist');
-if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath));
+// Serve static files from dist directory (if exists)
+if (fs.existsSync(path.join(__dirname, 'dist'))) {
+  app.use(express.static(path.join(__dirname, 'dist')));
 }
 
 // In-memory data storage (for demo purposes)
@@ -69,7 +68,7 @@ let customers = [
 ];
 
 // Auth middleware
-const authenticateToken = (req: any, res: any, next: any) => {
+const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -77,7 +76,7 @@ const authenticateToken = (req: any, res: any, next: any) => {
     return res.status(401).json({ message: 'Access token required' });
   }
 
-  jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
+  jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
       return res.status(403).json({ message: 'Invalid or expired token' });
     }
@@ -135,7 +134,7 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-app.get('/api/auth/me', authenticateToken, async (req: any, res) => {
+app.get('/api/auth/me', authenticateToken, async (req, res) => {
   try {
     const user = users.find(u => u.id === req.user.id && u.isActive);
     if (!user) {
@@ -188,31 +187,17 @@ app.get('/api/customers', authenticateToken, async (req, res) => {
 
 // Catch all handler for Angular routes
 app.get('*', (req, res) => {
-  const indexPath = path.join(distPath, 'index.html');
+  const indexPath = path.join(__dirname, 'src', 'index.html');
   if (fs.existsSync(indexPath)) {
     res.sendFile(indexPath);
   } else {
-    // If dist doesn't exist, serve development index.html
-    const devIndexPath = path.join(__dirname, '..', 'src', 'index.html');
-    if (fs.existsSync(devIndexPath)) {
-      res.sendFile(devIndexPath);
-    } else {
-      res.json({ 
-        message: 'AquaFlow API Server Running', 
-        status: 'Angular app not built yet',
-        loginCredentials: {
-          username: 'admin',
-          password: 'admin123'
-        }
-      });
-    }
+    res.json({ message: 'AquaFlow API Server - Angular app not built yet' });
   }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 AquaFlow server running on http://0.0.0.0:${PORT}`);
-  console.log('📱 Demo login credentials:');
-  console.log('   Username: admin');
-  console.log('   Password: admin123');
-  console.log('');
+  console.log(`AquaFlow server running on port ${PORT}`);
+  console.log('Demo login credentials:');
+  console.log('Username: admin');
+  console.log('Password: admin123');
 });

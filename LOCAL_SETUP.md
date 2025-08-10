@@ -83,6 +83,13 @@ If you get "password authentication failed" errors:
 2. The database is hosted on Neon and already contains all the tables and test user accounts
 3. You can skip `npm run db:push` if you get connection errors - the database is already set up
 
+### Port Conflict Issues
+If you get "EADDRINUSE" or "ENOTUP" port errors:
+1. Make sure no other service is running on port 3001
+2. Try a different port by changing PORT in your `.env` file (e.g., PORT=3002)
+3. On Windows, check if Windows Reserved Ports are causing conflicts
+4. Use `netstat -ano | findstr :3001` to check what's using the port
+
 ### Windows Command Issues
 - Use the provided `run-local.bat` file for easiest startup on Windows
 - Or use PowerShell with the `run-local.ps1` script

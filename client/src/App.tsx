@@ -15,6 +15,7 @@ import RentDues from "@/pages/rent-dues";
 import PurifierPurchases from "@/pages/purifier-purchases";
 import AmcPurchases from "@/pages/amc-purchases";
 import Inventory from "@/pages/inventory";
+import UserManagement from "@/pages/user-management";
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
 import { cn } from "@/lib/utils";
@@ -39,6 +40,7 @@ function AuthenticatedLayout() {
             <Route path="/purifier-purchases" component={PurifierPurchases} />
             <Route path="/amc-purchases" component={AmcPurchases} />
             <Route path="/inventory" component={Inventory} />
+            <Route path="/user-management" component={UserManagement} />
             <Route path="/auth" component={AuthPage} />
             <Route component={NotFound} />
           </Switch>

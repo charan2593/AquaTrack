@@ -15,7 +15,8 @@ import {
   Menu,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Shield
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -43,6 +44,13 @@ export default function Sidebar() {
       icon: LayoutDashboard,
       testId: "nav-dashboard"
     },
+    // Show User Management only to admins
+    ...(user?.role === 'admin' ? [{
+      title: "User Management",
+      href: "/user-management",
+      icon: Shield,
+      testId: "nav-user-management"
+    }] : []),
     {
       title: "Service Management",
       items: [

@@ -1,13 +1,9 @@
-import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Redirect } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -19,21 +15,10 @@ const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-const registerSchema = z.object({
-  mobile: z.string().regex(/^[6-9]\d{9}$/, "Please enter a valid Indian mobile number"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  email: z.string().email("Invalid email").optional().or(z.literal("")),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  role: z.enum(["admin", "manager", "technician"]).default("technician"),
-});
-
 type LoginForm = z.infer<typeof loginSchema>;
-type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
-  const { user, loginMutation, registerMutation } = useAuth();
-  const [activeTab, setActiveTab] = useState("login");
+  const { user, loginMutation } = useAuth();
 
   // Redirect if already logged in
   if (user) {
@@ -48,28 +33,8 @@ export default function AuthPage() {
     },
   });
 
-  const registerForm = useForm<RegisterForm>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      mobile: "",
-      password: "",
-      email: "",
-      firstName: "",
-      lastName: "",
-      role: "technician",
-    },
-  });
-
   const onLogin = (data: LoginForm) => {
     loginMutation.mutate(data);
-  };
-
-  const onRegister = (data: RegisterForm) => {
-    const registerData = {
-      ...data,
-      email: data.email || undefined,
-    };
-    registerMutation.mutate(registerData);
   };
 
   return (
@@ -87,11 +52,8 @@ export default function AuthPage() {
                   AquaFlow
                 </h1>
               </div>
-              <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white lg:text-4xl">
-                Water Purifier Service Management
-              </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-md">
-                Complete solution for managing water purifier services, customer data, 
+              <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
+                Complete water purifier service management system for customer tracking, service scheduling, 
                 inventory tracking, and business operations.
               </p>
             </div>
@@ -147,196 +109,62 @@ export default function AuthPage() {
             </div>
           </div>
 
-          {/* Right side - Auth form */}
+          {/* Right side - Login form */}
           <div className="flex items-center justify-center">
             <Card className="w-full max-w-md">
               <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl font-bold">Welcome</CardTitle>
+                <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
                 <CardDescription>
-                  Sign in to your account or create a new one
+                  Sign in to access your AquaFlow dashboard
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="login" data-testid="tab-login">Login</TabsTrigger>
-                    <TabsTrigger value="register" data-testid="tab-register">Register</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="login" className="space-y-4">
-                    <Form {...loginForm}>
-                      <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
-                        <FormField
-                          control={loginForm.control}
-                          name="mobile"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Mobile Number</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  placeholder="Enter your mobile number" 
-                                  data-testid="input-mobile"
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={loginForm.control}
-                          name="password"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Password</FormLabel>
-                              <FormControl>
-                                <PasswordInput 
-                                  placeholder="Enter your password"
-                                  data-testid="input-password"
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <Button 
-                          type="submit" 
-                          className="w-full" 
-                          data-testid="button-login"
-                          disabled={loginMutation.isPending}
-                        >
-                          {loginMutation.isPending ? "Signing in..." : "Sign In"}
-                        </Button>
-                      </form>
-                    </Form>
-                  </TabsContent>
-                  
-                  <TabsContent value="register" className="space-y-4">
-                    <Form {...registerForm}>
-                      <form onSubmit={registerForm.handleSubmit(onRegister)} className="space-y-4">
-                        <FormField
-                          control={registerForm.control}
-                          name="mobile"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Mobile Number *</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  placeholder="Enter your mobile number" 
-                                  data-testid="input-register-mobile"
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={registerForm.control}
-                          name="password"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Password *</FormLabel>
-                              <FormControl>
-                                <PasswordInput 
-                                  placeholder="Create a password"
-                                  data-testid="input-register-password"
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <div className="grid grid-cols-2 gap-2">
-                          <FormField
-                            control={registerForm.control}
-                            name="firstName"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>First Name</FormLabel>
-                                <FormControl>
-                                  <Input 
-                                    placeholder="First name"
-                                    data-testid="input-first-name"
-                                    {...field} 
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={registerForm.control}
-                            name="lastName"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Last Name</FormLabel>
-                                <FormControl>
-                                  <Input 
-                                    placeholder="Last name"
-                                    data-testid="input-last-name"
-                                    {...field} 
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                        <FormField
-                          control={registerForm.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Email</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="email" 
-                                  placeholder="Email address"
-                                  data-testid="input-email"
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={registerForm.control}
-                          name="role"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Role</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger data-testid="select-role">
-                                    <SelectValue placeholder="Select your role" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="technician">Technician</SelectItem>
-                                  <SelectItem value="manager">Manager</SelectItem>
-                                  <SelectItem value="admin">Administrator</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <Button 
-                          type="submit" 
-                          className="w-full"
-                          data-testid="button-register"
-                          disabled={registerMutation.isPending}
-                        >
-                          {registerMutation.isPending ? "Creating account..." : "Create Account"}
-                        </Button>
-                      </form>
-                    </Form>
-                  </TabsContent>
-                </Tabs>
+                <Form {...loginForm}>
+                  <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
+                    <FormField
+                      control={loginForm.control}
+                      name="mobile"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mobile Number</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Enter your mobile number" 
+                              data-testid="input-mobile"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={loginForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <PasswordInput 
+                              placeholder="Enter your password"
+                              data-testid="input-password"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      data-testid="button-login"
+                      disabled={loginMutation.isPending}
+                    >
+                      {loginMutation.isPending ? "Signing in..." : "Sign In"}
+                    </Button>
+                  </form>
+                </Form>
               </CardContent>
             </Card>
           </div>

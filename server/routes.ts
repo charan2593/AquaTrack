@@ -254,6 +254,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User Management API Routes (Admin only)
+  
+  // Get all users
+  app.get("/api/users", isAuthenticated, async (req: any, res) => {
+    try {
+      // Check if user is admin
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: "Access denied. Admin access required." });
+      }
+      
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Create new user
+  app.post("/api/users", isAuthenticated, async (req: any, res) => {
+    try {
+      // Check if user is admin
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: "Access denied. Admin access required." });
+      }
+
+      const userData = req.body;
+      const existingUser = await storage.getUserByMobile(userData.mobile);
+      if (existingUser) {
+        return res.status(400).json({ message: "Mobile number already registered" });
+      }
+
+      const user = await storage.createUser(userData);
+      // Don't return password in response
+      const { password, ...userResponse } = user;
+      res.status(201).json(userResponse);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ message: "Failed to create user" });
+    }
+  });
+
+  // Update user
+  app.put("/api/users/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      // Check if user is admin
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: "Access denied. Admin access required." });
+      }
+
+      const { id } = req.params;
+      const userData = req.body;
+
+      const user = await storage.updateUser(id, userData);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Don't return password in response
+      const { password, ...userResponse } = user;
+      res.json(userResponse);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "Failed to update user" });
+    }
+  });
+
+  // Delete user
+  app.delete("/api/users/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      // Check if user is admin
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: "Access denied. Admin access required." });
+      }
+
+      const { id } = req.params;
+      
+      // Don't allow deleting self
+      if (req.user?.id === id) {
+        return res.status(400).json({ message: "Cannot delete your own account" });
+      }
+
+      const deleted = await storage.deleteUser(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

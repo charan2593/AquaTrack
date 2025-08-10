@@ -128,20 +128,26 @@
 }
 
 .sidebar-transition {
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
 }
 
-.nav-item {
-  @apply flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg transition-colors duration-200;
+/* Ensure sidebar buttons don't break layout when collapsed */
+.sidebar-nav-button {
+  @apply transition-all duration-200 ease-in-out;
+  min-height: 3rem;
 }
 
-.nav-item:hover {
-  background-color: hsl(var(--accent) / 0.2);
-  color: hsl(var(--accent-foreground));
+.sidebar-nav-button.collapsed {
+  @apply w-10 h-10 p-0 justify-center;
 }
 
-.nav-item.active {
-  @apply bg-accent text-accent-foreground border-r-2 border-primary;
+.sidebar-nav-button.expanded {
+  @apply justify-start px-3;
+}
+
+/* Mobile sidebar overlay */
+.sidebar-overlay {
+  backdrop-filter: blur(4px);
 }
 
 .tab-content {

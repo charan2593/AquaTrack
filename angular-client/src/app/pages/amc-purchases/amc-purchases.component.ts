@@ -1,27 +1,21 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-amc-purchases',
   standalone: true,
-  imports: [CommonModule, MatCardModule],
+  imports: [CommonModule],
   template: `
-    <div class="page-container">
+    <div class="amc-purchases-container">
       <h1>AMC Purchases</h1>
-      <mat-card>
-        <mat-card-content>
-          <p>AMC purchases management functionality will be implemented here.</p>
-        </mat-card-content>
-      </mat-card>
+      <p>AMC purchase management will be implemented here.</p>
     </div>
   `,
   styles: [`
-    .page-container {
-      padding: 32px;
-      max-width: 1400px;
-      margin: 0 auto;
+    .amc-purchases-container {
+      padding: 24px;
     }
   `]
 })
-export class AmcPurchasesComponent {}
+export class AmcPurchasesComponent {
+}

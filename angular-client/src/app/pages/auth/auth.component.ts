@@ -1,16 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -20,191 +19,206 @@ import { AuthService } from '../../services/auth.service';
     CommonModule,
     ReactiveFormsModule,
     MatCardModule,
+    MatTabsModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatTabsModule,
-    MatSelectModule,
     MatIconModule,
-    MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatSelectModule,
+    MatSnackBarModule
   ],
   template: `
     <div class="auth-container">
       <div class="auth-content">
-        <!-- Left side - Hero section -->
-        <div class="hero-section">
+        <!-- Left side - Forms -->
+        <div class="auth-forms">
+          <div class="brand-header">
+            <mat-icon class="brand-icon">water_drop</mat-icon>
+            <h1>AquaFlow</h1>
+            <p>Water Purifier Service Management</p>
+          </div>
+
+          <mat-card>
+            <mat-tab-group animationDuration="0ms" dynamicHeight>
+              <!-- Login Tab -->
+              <mat-tab label="Login" data-testid="tab-login">
+                <div class="tab-content">
+                  <form [formGroup]="loginForm" (ngSubmit)="onLogin()" data-testid="form-login">
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Username</mat-label>
+                      <input matInput 
+                             formControlName="username" 
+                             data-testid="input-username"
+                             autocomplete="username">
+                      <mat-icon matSuffix>person</mat-icon>
+                      <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
+                        Username is required
+                      </mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Password</mat-label>
+                      <input matInput 
+                             [type]="hidePassword ? 'password' : 'text'"
+                             formControlName="password"
+                             data-testid="input-password"
+                             autocomplete="current-password">
+                      <button type="button" 
+                              mat-icon-button 
+                              matSuffix 
+                              (click)="hidePassword = !hidePassword"
+                              data-testid="button-toggle-password">
+                        <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                      </button>
+                      <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+                        Password is required
+                      </mat-error>
+                    </mat-form-field>
+
+                    <button type="submit" 
+                            mat-raised-button 
+                            color="primary" 
+                            class="full-width auth-button"
+                            [disabled]="loginForm.invalid || isLoggingIn"
+                            data-testid="button-login">
+                      <mat-icon *ngIf="isLoggingIn">hourglass_empty</mat-icon>
+                      <span>{{isLoggingIn ? 'Signing In...' : 'Sign In'}}</span>
+                    </button>
+                  </form>
+                </div>
+              </mat-tab>
+
+              <!-- Register Tab -->
+              <mat-tab label="Register" data-testid="tab-register">
+                <div class="tab-content">
+                  <form [formGroup]="registerForm" (ngSubmit)="onRegister()" data-testid="form-register">
+                    <div class="form-row">
+                      <mat-form-field appearance="outline" class="half-width">
+                        <mat-label>First Name</mat-label>
+                        <input matInput 
+                               formControlName="firstName" 
+                               data-testid="input-first-name"
+                               autocomplete="given-name">
+                        <mat-icon matSuffix>person</mat-icon>
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline" class="half-width">
+                        <mat-label>Last Name</mat-label>
+                        <input matInput 
+                               formControlName="lastName" 
+                               data-testid="input-last-name"
+                               autocomplete="family-name">
+                        <mat-icon matSuffix>person</mat-icon>
+                      </mat-form-field>
+                    </div>
+
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Username</mat-label>
+                      <input matInput 
+                             formControlName="username" 
+                             data-testid="input-register-username"
+                             autocomplete="username">
+                      <mat-icon matSuffix>account_circle</mat-icon>
+                      <mat-error *ngIf="registerForm.get('username')?.hasError('required')">
+                        Username is required
+                      </mat-error>
+                      <mat-error *ngIf="registerForm.get('username')?.hasError('minlength')">
+                        Username must be at least 3 characters
+                      </mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Email</mat-label>
+                      <input matInput 
+                             type="email"
+                             formControlName="email" 
+                             data-testid="input-email"
+                             autocomplete="email">
+                      <mat-icon matSuffix>email</mat-icon>
+                      <mat-error *ngIf="registerForm.get('email')?.hasError('email')">
+                        Please enter a valid email
+                      </mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Role</mat-label>
+                      <mat-select formControlName="role" data-testid="select-role">
+                        <mat-option value="technician">Technician</mat-option>
+                        <mat-option value="manager">Manager</mat-option>
+                        <mat-option value="admin">Administrator</mat-option>
+                      </mat-select>
+                      <mat-icon matSuffix>work</mat-icon>
+                      <mat-error *ngIf="registerForm.get('role')?.hasError('required')">
+                        Please select a role
+                      </mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Password</mat-label>
+                      <input matInput 
+                             [type]="hideRegisterPassword ? 'password' : 'text'"
+                             formControlName="password"
+                             data-testid="input-register-password"
+                             autocomplete="new-password">
+                      <button type="button" 
+                              mat-icon-button 
+                              matSuffix 
+                              (click)="hideRegisterPassword = !hideRegisterPassword"
+                              data-testid="button-toggle-register-password">
+                        <mat-icon>{{hideRegisterPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                      </button>
+                      <mat-error *ngIf="registerForm.get('password')?.hasError('required')">
+                        Password is required
+                      </mat-error>
+                      <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">
+                        Password must be at least 6 characters
+                      </mat-error>
+                    </mat-form-field>
+
+                    <button type="submit" 
+                            mat-raised-button 
+                            color="primary" 
+                            class="full-width auth-button"
+                            [disabled]="registerForm.invalid || isRegistering"
+                            data-testid="button-register">
+                      <mat-icon *ngIf="isRegistering">hourglass_empty</mat-icon>
+                      <span>{{isRegistering ? 'Creating Account...' : 'Create Account'}}</span>
+                    </button>
+                  </form>
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+          </mat-card>
+        </div>
+
+        <!-- Right side - Hero Section -->
+        <div class="auth-hero">
           <div class="hero-content">
-            <div class="logo-section">
-              <div class="logo-icon">
-                <mat-icon>water_drop</mat-icon>
-              </div>
-              <h1>AquaFlow</h1>
-            </div>
-            
-            <h2>Water Purifier Service Management</h2>
-            <p class="hero-description">
-              Complete solution for managing water purifier services, customer data, 
-              inventory tracking, and business operations.
+            <mat-icon class="hero-icon">water_drop</mat-icon>
+            <h2>Streamline Your Water Purifier Services</h2>
+            <p>
+              Manage customers, schedule services, track inventory, and handle rent collections 
+              all in one comprehensive platform designed for water purifier service businesses.
             </p>
-
-            <div class="features-grid">
+            <div class="features-list">
               <div class="feature-item">
-                <div class="feature-icon blue">
-                  <mat-icon>people</mat-icon>
-                </div>
-                <div class="feature-text">
-                  <h3>Customer Management</h3>
-                  <p>Track customer details, service history, and preferences</p>
-                </div>
+                <mat-icon>check_circle</mat-icon>
+                <span>Customer Management</span>
               </div>
-
               <div class="feature-item">
-                <div class="feature-icon green">
-                  <mat-icon>build</mat-icon>
-                </div>
-                <div class="feature-text">
-                  <h3>Service Scheduling</h3>
-                  <p>Schedule and track maintenance visits and repairs</p>
-                </div>
+                <mat-icon>check_circle</mat-icon>
+                <span>Service Scheduling</span>
               </div>
-
               <div class="feature-item">
-                <div class="feature-icon purple">
-                  <mat-icon>security</mat-icon>
-                </div>
-                <div class="feature-text">
-                  <h3>Inventory Control</h3>
-                  <p>Manage parts, filters, and equipment inventory</p>
-                </div>
+                <mat-icon>check_circle</mat-icon>
+                <span>Inventory Tracking</span>
               </div>
-
               <div class="feature-item">
-                <div class="feature-icon orange">
-                  <mat-icon>attach_money</mat-icon>
-                </div>
-                <div class="feature-text">
-                  <h3>Financial Tracking</h3>
-                  <p>Monitor rent dues, purchases, and revenue</p>
-                </div>
+                <mat-icon>check_circle</mat-icon>
+                <span>Rent Collection</span>
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Right side - Auth form -->
-        <div class="form-section">
-          <mat-card class="auth-card">
-            <mat-card-header>
-              <mat-card-title>Welcome</mat-card-title>
-              <mat-card-subtitle>Sign in to your account or create a new one</mat-card-subtitle>
-            </mat-card-header>
-
-            <mat-card-content>
-              <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="auth-tabs">
-                <mat-tab label="Login">
-                  <div class="tab-content">
-                    <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-                      <mat-form-field appearance="outline">
-                        <mat-label>Username</mat-label>
-                        <input matInput formControlName="username" required>
-                        <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
-                          Username is required
-                        </mat-error>
-                      </mat-form-field>
-
-                      <mat-form-field appearance="outline">
-                        <mat-label>Password</mat-label>
-                        <input matInput type="password" formControlName="password" required>
-                        <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
-                          Password is required
-                        </mat-error>
-                      </mat-form-field>
-
-                      <button 
-                        mat-raised-button 
-                        color="primary" 
-                        type="submit" 
-                        class="submit-button"
-                        [disabled]="loginForm.invalid || loginLoading">
-                        <mat-spinner diameter="20" *ngIf="loginLoading"></mat-spinner>
-                        <span *ngIf="!loginLoading">Sign In</span>
-                        <span *ngIf="loginLoading">Signing in...</span>
-                      </button>
-                    </form>
-                  </div>
-                </mat-tab>
-
-                <mat-tab label="Register">
-                  <div class="tab-content">
-                    <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
-                      <mat-form-field appearance="outline">
-                        <mat-label>Username *</mat-label>
-                        <input matInput formControlName="username" required>
-                        <mat-error *ngIf="registerForm.get('username')?.hasError('required')">
-                          Username is required
-                        </mat-error>
-                        <mat-error *ngIf="registerForm.get('username')?.hasError('minlength')">
-                          Username must be at least 3 characters
-                        </mat-error>
-                      </mat-form-field>
-
-                      <mat-form-field appearance="outline">
-                        <mat-label>Password *</mat-label>
-                        <input matInput type="password" formControlName="password" required>
-                        <mat-error *ngIf="registerForm.get('password')?.hasError('required')">
-                          Password is required
-                        </mat-error>
-                        <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">
-                          Password must be at least 6 characters
-                        </mat-error>
-                      </mat-form-field>
-
-                      <div class="name-row">
-                        <mat-form-field appearance="outline">
-                          <mat-label>First Name</mat-label>
-                          <input matInput formControlName="firstName">
-                        </mat-form-field>
-
-                        <mat-form-field appearance="outline">
-                          <mat-label>Last Name</mat-label>
-                          <input matInput formControlName="lastName">
-                        </mat-form-field>
-                      </div>
-
-                      <mat-form-field appearance="outline">
-                        <mat-label>Email</mat-label>
-                        <input matInput type="email" formControlName="email">
-                        <mat-error *ngIf="registerForm.get('email')?.hasError('email')">
-                          Please enter a valid email
-                        </mat-error>
-                      </mat-form-field>
-
-                      <mat-form-field appearance="outline">
-                        <mat-label>Role</mat-label>
-                        <mat-select formControlName="role">
-                          <mat-option value="technician">Technician</mat-option>
-                          <mat-option value="manager">Manager</mat-option>
-                          <mat-option value="admin">Administrator</mat-option>
-                        </mat-select>
-                      </mat-form-field>
-
-                      <button 
-                        mat-raised-button 
-                        color="primary" 
-                        type="submit" 
-                        class="submit-button"
-                        [disabled]="registerForm.invalid || registerLoading">
-                        <mat-spinner diameter="20" *ngIf="registerLoading"></mat-spinner>
-                        <span *ngIf="!registerLoading">Create Account</span>
-                        <span *ngIf="registerLoading">Creating account...</span>
-                      </button>
-                    </form>
-                  </div>
-                </mat-tab>
-              </mat-tab-group>
-            </mat-card-content>
-          </mat-card>
         </div>
       </div>
     </div>
@@ -212,208 +226,186 @@ import { AuthService } from '../../services/auth.service';
   styles: [`
     .auth-container {
       min-height: 100vh;
-      background: linear-gradient(135deg, 
-        hsl(var(--winter-light)) 0%, 
-        rgba(255, 255, 255, 0.8) 100%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
 
     .auth-content {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      min-height: 100vh;
-      gap: 40px;
-      align-items: center;
-      padding: 40px;
-      max-width: 1400px;
-      margin: 0 auto;
+      display: flex;
+      max-width: 1200px;
+      width: 100%;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      overflow: hidden;
     }
 
-    .hero-section {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+    .auth-forms {
+      flex: 1;
       padding: 40px;
+      max-width: 500px;
     }
 
-    .logo-section {
-      display: flex;
-      align-items: center;
-      gap: 16px;
+    .brand-header {
+      text-align: center;
       margin-bottom: 32px;
     }
 
-    .logo-icon {
-      background: hsl(var(--winter-primary));
-      border-radius: 12px;
-      padding: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .logo-icon mat-icon {
-      font-size: 32px;
-      width: 32px;
-      height: 32px;
-      color: white;
-    }
-
-    .hero-section h1 {
-      margin: 0;
+    .brand-icon {
       font-size: 48px;
-      font-weight: 700;
-      color: hsl(var(--winter-dark));
+      width: 48px;
+      height: 48px;
+      color: #1e40af;
+      margin-bottom: 16px;
     }
 
-    .hero-section h2 {
-      font-size: 32px;
-      font-weight: 600;
-      color: hsl(var(--winter-dark));
-      margin: 0 0 16px 0;
-      line-height: 1.2;
-    }
-
-    .hero-description {
-      font-size: 18px;
-      color: hsl(var(--winter-dark) / 0.7);
-      margin-bottom: 48px;
-      max-width: 500px;
-      line-height: 1.6;
-    }
-
-    .features-grid {
-      display: grid;
-      gap: 32px;
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .feature-item {
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-    }
-
-    .feature-icon {
-      border-radius: 12px;
-      padding: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .feature-icon mat-icon {
-      font-size: 24px;
-      width: 24px;
-      height: 24px;
-      color: white;
-    }
-
-    .feature-icon.blue { background: #2196f3; }
-    .feature-icon.green { background: #4caf50; }
-    .feature-icon.purple { background: #9c27b0; }
-    .feature-icon.orange { background: #ff9800; }
-
-    .feature-text h3 {
+    .brand-header h1 {
       margin: 0 0 8px 0;
-      font-size: 16px;
-      font-weight: 600;
-      color: hsl(var(--winter-dark));
+      font-size: 32px;
+      font-weight: 700;
+      color: #1e40af;
     }
 
-    .feature-text p {
+    .brand-header p {
       margin: 0;
+      color: #666;
       font-size: 14px;
-      color: hsl(var(--winter-dark) / 0.7);
-      line-height: 1.5;
-    }
-
-    .form-section {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .auth-card {
-      width: 100%;
-      max-width: 500px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    }
-
-    .auth-tabs {
-      margin-top: 24px;
     }
 
     .tab-content {
       padding: 24px 0;
     }
 
-    .mat-mdc-form-field {
+    .form-row {
+      display: flex;
+      gap: 16px;
+    }
+
+    .full-width {
       width: 100%;
       margin-bottom: 16px;
     }
 
-    .name-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+    .half-width {
+      flex: 1;
+      margin-bottom: 16px;
+    }
+
+    .auth-button {
+      margin-top: 8px;
+      height: 48px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .auth-hero {
+      flex: 1;
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      color: white;
+      padding: 60px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-content {
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .hero-icon {
+      font-size: 80px;
+      width: 80px;
+      height: 80px;
+      margin-bottom: 24px;
+      opacity: 0.9;
+    }
+
+    .hero-content h2 {
+      margin: 0 0 24px 0;
+      font-size: 28px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .hero-content p {
+      margin: 0 0 32px 0;
+      font-size: 16px;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    .features-list {
+      display: flex;
+      flex-direction: column;
       gap: 16px;
     }
 
-    .submit-button {
-      width: 100%;
-      height: 48px;
-      margin-top: 16px;
-      font-size: 16px;
-      font-weight: 600;
-      border-radius: 8px;
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
+    .feature-item mat-icon {
+      color: #60a5fa;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .feature-item span {
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    /* Mobile responsiveness */
     @media (max-width: 768px) {
       .auth-content {
-        grid-template-columns: 1fr;
-        padding: 20px;
-        gap: 20px;
+        flex-direction: column;
+        margin: 0;
+        border-radius: 0;
+        min-height: 100vh;
       }
 
-      .hero-section {
-        order: 2;
-        padding: 20px;
+      .auth-forms {
+        padding: 24px;
       }
 
-      .form-section {
-        order: 1;
+      .auth-hero {
+        padding: 40px 24px;
       }
 
-      .hero-section h1 {
-        font-size: 36px;
+      .form-row {
+        flex-direction: column;
       }
 
-      .hero-section h2 {
+      .half-width {
+        width: 100%;
+      }
+
+      .hero-content h2 {
         font-size: 24px;
       }
 
-      .features-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
-      }
-
-      .name-row {
-        grid-template-columns: 1fr;
-        gap: 0;
+      .hero-icon {
+        font-size: 60px;
+        width: 60px;
+        height: 60px;
       }
     }
   `]
 })
-export class AuthComponent {
+export class AuthComponent implements OnInit {
   loginForm: FormGroup;
   registerForm: FormGroup;
-  selectedTabIndex = 0;
-  loginLoading = false;
-  registerLoading = false;
+  hidePassword = true;
+  hideRegisterPassword = true;
+  isLoggingIn = false;
+  isRegistering = false;
 
   constructor(
     private fb: FormBuilder,
@@ -427,68 +419,73 @@ export class AuthComponent {
     });
 
     this.registerForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      email: ['', Validators.email],
       firstName: [''],
       lastName: [''],
-      role: ['technician']
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', Validators.email],
+      role: ['technician', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
+  }
 
+  ngOnInit(): void {
     // Redirect if already authenticated
-    this.authService.isAuthenticated$.subscribe(isAuth => {
-      if (isAuth) {
-        this.router.navigate(['/dashboard']);
+    this.authService.isAuthenticated$.subscribe(isAuthenticated => {
+      if (isAuthenticated) {
+        this.router.navigate(['/']);
       }
     });
   }
 
-  onLogin() {
-    if (this.loginForm.valid) {
-      this.loginLoading = true;
+  onLogin(): void {
+    if (this.loginForm.valid && !this.isLoggingIn) {
+      this.isLoggingIn = true;
+      
       this.authService.login(this.loginForm.value).subscribe({
         next: () => {
-          this.snackBar.open('Login successful!', 'Close', { duration: 3000 });
-          this.router.navigate(['/dashboard']);
-        },
-        error: (error) => {
-          this.loginLoading = false;
-          this.snackBar.open(error.error?.message || 'Login failed', 'Close', { 
-            duration: 5000,
-            panelClass: ['error-snackbar']
+          this.router.navigate(['/']);
+          this.snackBar.open('Login successful!', 'Close', {
+            duration: 3000,
+            panelClass: 'success-snackbar'
           });
         },
-        complete: () => {
-          this.loginLoading = false;
+        error: (error) => {
+          this.isLoggingIn = false;
+          this.snackBar.open(
+            error.error?.message || 'Login failed. Please check your credentials.',
+            'Close',
+            {
+              duration: 5000,
+              panelClass: 'error-snackbar'
+            }
+          );
         }
       });
     }
   }
 
-  onRegister() {
-    if (this.registerForm.valid) {
-      this.registerLoading = true;
-      const registerData = { ...this.registerForm.value };
+  onRegister(): void {
+    if (this.registerForm.valid && !this.isRegistering) {
+      this.isRegistering = true;
       
-      // Remove empty email if not provided
-      if (!registerData.email) {
-        delete registerData.email;
-      }
-
-      this.authService.register(registerData).subscribe({
+      this.authService.register(this.registerForm.value).subscribe({
         next: () => {
-          this.snackBar.open('Account created successfully!', 'Close', { duration: 3000 });
-          this.router.navigate(['/dashboard']);
-        },
-        error: (error) => {
-          this.registerLoading = false;
-          this.snackBar.open(error.error?.message || 'Registration failed', 'Close', {
-            duration: 5000,
-            panelClass: ['error-snackbar']
+          this.router.navigate(['/']);
+          this.snackBar.open('Account created successfully!', 'Close', {
+            duration: 3000,
+            panelClass: 'success-snackbar'
           });
         },
-        complete: () => {
-          this.registerLoading = false;
+        error: (error) => {
+          this.isRegistering = false;
+          this.snackBar.open(
+            error.error?.message || 'Registration failed. Please try again.',
+            'Close',
+            {
+              duration: 5000,
+              panelClass: 'error-snackbar'
+            }
+          );
         }
       });
     }

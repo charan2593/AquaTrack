@@ -9,9 +9,11 @@ Preferred communication style: Simple, everyday language.
 # System Architecture
 
 ## Frontend Architecture
-The client-side application is being migrated from React to Angular 17+ with TypeScript following a component-based architecture. The UI layer utilizes Angular Material components providing a consistent and accessible design system with Material Design 3 principles. The application employs Angular Router for client-side routing with lazy loading and guards for authentication. State management is handled through Angular services and RxJS observables for reactive programming patterns.
+The client-side application is a hybrid system with both React and Angular implementations available. The primary React application uses Vite build system with TypeScript and provides a complete water purifier service management interface. An Angular 17+ implementation is being developed in parallel in the `angular-client` directory with TypeScript, standalone components, and Material Design.
 
-The frontend implements a responsive design using Angular Material themes with a custom winter-themed color palette. Chart.js is integrated for data visualization, providing interactive charts for dashboard analytics and reporting. The application structure follows Angular's recommended organization with standalone components, services, and feature modules.
+The React frontend utilizes shadcn/ui components with Tailwind CSS for consistent design, providing dashboard analytics, customer management, service scheduling, inventory tracking, and authentication. The Angular version follows Material Design 3 principles with Angular Material components and employs Angular Router for routing with lazy loading and authentication guards.
+
+Both implementations share the same backend API and authentication system, allowing for seamless switching between frameworks for development and testing purposes.
 
 ## Backend Architecture
 The server-side follows a RESTful API architecture built with Express.js and TypeScript. The application uses a layered architecture pattern with clear separation between routes, business logic (storage layer), and data access. Authentication is implemented using Replit's OpenID Connect integration with Passport.js, providing secure user authentication and session management.

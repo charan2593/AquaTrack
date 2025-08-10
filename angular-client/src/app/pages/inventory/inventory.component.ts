@@ -1,27 +1,21 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, MatCardModule],
+  imports: [CommonModule],
   template: `
-    <div class="page-container">
-      <h1>Inventory Management</h1>
-      <mat-card>
-        <mat-card-content>
-          <p>Inventory management functionality will be implemented here.</p>
-        </mat-card-content>
-      </mat-card>
+    <div class="inventory-container">
+      <h1>Inventory Dashboard</h1>
+      <p>Inventory management functionality will be implemented here.</p>
     </div>
   `,
   styles: [`
-    .page-container {
-      padding: 32px;
-      max-width: 1400px;
-      margin: 0 auto;
+    .inventory-container {
+      padding: 24px;
     }
   `]
 })
-export class InventoryComponent {}
+export class InventoryComponent {
+}

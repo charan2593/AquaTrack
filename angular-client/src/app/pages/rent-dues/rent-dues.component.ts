@@ -1,27 +1,21 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-rent-dues',
   standalone: true,
-  imports: [CommonModule, MatCardModule],
+  imports: [CommonModule],
   template: `
-    <div class="page-container">
+    <div class="rent-dues-container">
       <h1>Rent Dues</h1>
-      <mat-card>
-        <mat-card-content>
-          <p>Rent dues management functionality will be implemented here.</p>
-        </mat-card-content>
-      </mat-card>
+      <p>Rent collection management will be implemented here.</p>
     </div>
   `,
   styles: [`
-    .page-container {
-      padding: 32px;
-      max-width: 1400px;
-      margin: 0 auto;
+    .rent-dues-container {
+      padding: 24px;
     }
   `]
 })
-export class RentDuesComponent {}
+export class RentDuesComponent {
+}

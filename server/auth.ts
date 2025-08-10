@@ -17,14 +17,23 @@ declare global {
 
 const scryptAsync = promisify(scrypt);
 
-async function hashPassword(password: string): Promise<string> {
+export async function hashPassword(password: string): Promise<string> {
   const salt = randomBytes(16).toString("hex");
   const buf = (await scryptAsync(password, salt, 64)) as Buffer;
   return `${buf.toString("hex")}.${salt}`;
 }
 
 async function comparePasswords(supplied: string, stored: string): Promise<boolean> {
+  // Check if the stored password is properly hashed (contains a dot separator)
+  if (!stored.includes('.')) {
+    return false; // Invalid hash format, deny login
+  }
+  
   const [hashed, salt] = stored.split(".");
+  if (!hashed || !salt) {
+    return false; // Invalid hash format, deny login
+  }
+  
   const hashedBuf = Buffer.from(hashed, "hex");
   const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
   return timingSafeEqual(hashedBuf, suppliedBuf);

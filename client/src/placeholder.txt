@@ -1,1 +1,0 @@
-Angular components temporarily removed - using inline component in HTML

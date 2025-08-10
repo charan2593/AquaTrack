@@ -171,6 +171,7 @@ If you get connection timeout or refused errors:
 1. **Check Hostinger Settings:** Ensure external connections are enabled
 2. **Try Different Connection Strings:**
    - `?sslmode=disable` instead of `?sslmode=require`
+   - Remove SSL completely: `postgresql://username:password@hostname:port/database_name`
    - Use internal hostname if available (check Hostinger control panel)
    - Some plans use port 3306 instead of 5432
 3. **Contact Hostinger Support:** External database access may need to be enabled

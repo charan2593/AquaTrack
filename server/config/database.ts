@@ -64,9 +64,11 @@ export function getDatabaseConfig(): DatabaseConfig {
   console.log(`[Database Config] Database URL: ${databaseUrl.replace(/:[^:]*@/, ':***@')}`);
   console.log(`[Database Config] Connection Pool: ${JSON.stringify(config.connectionPool)}`);
 
-  // Test database connection
-  if (databaseUrl.includes('hostinger') || databaseUrl.includes('145.79.209.203')) {
-    console.log('[Database] Detected external database, testing connection...');
+  // Test database connection and log SSL handling
+  if (databaseUrl.includes('hostinger') || databaseUrl.includes('hstgr.io') || databaseUrl.includes('145.79.209.203')) {
+    console.log('[Database] Detected Hostinger database - SSL will be disabled for compatibility');
+  } else if (databaseUrl.includes('neon.tech')) {
+    console.log('[Database] Detected Neon database - SSL will be enabled');
   }
 
   return config;

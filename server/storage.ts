@@ -29,7 +29,7 @@ import { eq, and, desc, sql, gte, lte } from "drizzle-orm";
 export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByMobile(mobile: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   
   // Customer operations
@@ -82,8 +82,8 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+  async getUserByMobile(mobile: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.mobile, mobile));
     return user;
   }
 

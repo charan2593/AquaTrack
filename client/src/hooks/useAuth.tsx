@@ -18,12 +18,12 @@ type AuthContextType = {
 };
 
 type LoginData = {
-  username: string;
+  mobile: string;
   password: string;
 };
 
 type RegisterData = {
-  username: string;
+  mobile: string;
   password: string;
   email?: string;
   firstName?: string;

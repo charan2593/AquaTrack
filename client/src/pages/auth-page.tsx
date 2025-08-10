@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Redirect } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,12 +15,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Droplets, Shield, Users, Wrench } from "lucide-react";
 
 const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
+  mobile: z.string().regex(/^[6-9]\d{9}$/, "Please enter a valid Indian mobile number"),
   password: z.string().min(1, "Password is required"),
 });
 
 const registerSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
+  mobile: z.string().regex(/^[6-9]\d{9}$/, "Please enter a valid Indian mobile number"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   email: z.string().email("Invalid email").optional().or(z.literal("")),
   firstName: z.string().optional(),
@@ -42,7 +43,7 @@ export default function AuthPage() {
   const loginForm = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
+      mobile: "",
       password: "",
     },
   });
@@ -50,7 +51,7 @@ export default function AuthPage() {
   const registerForm = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: "",
+      mobile: "",
       password: "",
       email: "",
       firstName: "",
@@ -167,14 +168,14 @@ export default function AuthPage() {
                       <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
                         <FormField
                           control={loginForm.control}
-                          name="username"
+                          name="mobile"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Username</FormLabel>
+                              <FormLabel>Mobile Number</FormLabel>
                               <FormControl>
                                 <Input 
-                                  placeholder="Enter your username" 
-                                  data-testid="input-username"
+                                  placeholder="Enter your mobile number" 
+                                  data-testid="input-mobile"
                                   {...field} 
                                 />
                               </FormControl>
@@ -189,8 +190,7 @@ export default function AuthPage() {
                             <FormItem>
                               <FormLabel>Password</FormLabel>
                               <FormControl>
-                                <Input 
-                                  type="password" 
+                                <PasswordInput 
                                   placeholder="Enter your password"
                                   data-testid="input-password"
                                   {...field} 
@@ -217,14 +217,14 @@ export default function AuthPage() {
                       <form onSubmit={registerForm.handleSubmit(onRegister)} className="space-y-4">
                         <FormField
                           control={registerForm.control}
-                          name="username"
+                          name="mobile"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Username *</FormLabel>
+                              <FormLabel>Mobile Number *</FormLabel>
                               <FormControl>
                                 <Input 
-                                  placeholder="Choose a username" 
-                                  data-testid="input-register-username"
+                                  placeholder="Enter your mobile number" 
+                                  data-testid="input-register-mobile"
                                   {...field} 
                                 />
                               </FormControl>
@@ -239,8 +239,7 @@ export default function AuthPage() {
                             <FormItem>
                               <FormLabel>Password *</FormLabel>
                               <FormControl>
-                                <Input 
-                                  type="password" 
+                                <PasswordInput 
                                   placeholder="Create a password"
                                   data-testid="input-register-password"
                                   {...field} 

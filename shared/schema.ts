@@ -28,7 +28,7 @@ export const sessions = pgTable(
 // User storage table.
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: varchar("username").notNull().unique(),
+  mobile: varchar("mobile").notNull().unique(),
   password: varchar("password").notNull(),
   email: varchar("email").unique(),
   firstName: varchar("first_name"),
@@ -138,6 +138,8 @@ export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  mobile: z.string().regex(/^[6-9]\d{9}$/, "Please enter a valid Indian mobile number"),
 });
 
 export const insertCustomerSchema = createInsertSchema(customers).omit({

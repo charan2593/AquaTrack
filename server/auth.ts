@@ -64,11 +64,11 @@ export function setupAuth(app: Express) {
   app.use(passport.session());
 
   passport.use(
-    new LocalStrategy(async (username, password, done) => {
+    new LocalStrategy({ usernameField: 'mobile' }, async (mobile, password, done) => {
       try {
-        const user = await storage.getUserByUsername(username);
+        const user = await storage.getUserByMobile(mobile);
         if (!user || !(await comparePasswords(password, user.password))) {
-          return done(null, false, { message: 'Invalid username or password' });
+          return done(null, false, { message: 'Invalid mobile number or password' });
         }
         return done(null, user);
       } catch (error) {
@@ -89,19 +89,19 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res, next) => {
     try {
-      const { username, password, email, firstName, lastName, role = 'technician' } = req.body;
+      const { mobile, password, email, firstName, lastName, role = 'technician' } = req.body;
       
-      if (!username || !password) {
-        return res.status(400).json({ message: "Username and password are required" });
+      if (!mobile || !password) {
+        return res.status(400).json({ message: "Mobile number and password are required" });
       }
 
-      const existingUser = await storage.getUserByUsername(username);
+      const existingUser = await storage.getUserByMobile(mobile);
       if (existingUser) {
-        return res.status(400).json({ message: "Username already exists" });
+        return res.status(400).json({ message: "Mobile number already registered" });
       }
 
       const user = await storage.createUser({
-        username,
+        mobile,
         password: await hashPassword(password),
         email,
         firstName,
@@ -113,7 +113,7 @@ export function setupAuth(app: Express) {
         if (err) return next(err);
         res.status(201).json({
           id: user.id,
-          username: user.username,
+          mobile: user.mobile,
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
@@ -140,7 +140,7 @@ export function setupAuth(app: Express) {
         }
         res.status(200).json({
           id: user.id,
-          username: user.username,
+          mobile: user.mobile,
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,

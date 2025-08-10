@@ -1,21 +1,27 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-purifier-purchases',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatCardModule],
   template: `
-    <div class="purifier-purchases-container">
+    <div class="page-container">
       <h1>Purifier Purchases</h1>
-      <p>Purifier purchase management will be implemented here.</p>
+      <mat-card>
+        <mat-card-content>
+          <p>Purifier purchases management functionality will be implemented here.</p>
+        </mat-card-content>
+      </mat-card>
     </div>
   `,
   styles: [`
-    .purifier-purchases-container {
-      padding: 24px;
+    .page-container {
+      padding: 32px;
+      max-width: 1400px;
+      margin: 0 auto;
     }
   `]
 })
-export class PurifierPurchasesComponent {
-}
+export class PurifierPurchasesComponent {}

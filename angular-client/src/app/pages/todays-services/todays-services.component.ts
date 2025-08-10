@@ -1,21 +1,27 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-todays-services',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatCardModule],
   template: `
-    <div class="todays-services-container">
+    <div class="page-container">
       <h1>Today's Services</h1>
-      <p>Today's service schedule will be displayed here.</p>
+      <mat-card>
+        <mat-card-content>
+          <p>Today's services functionality will be implemented here.</p>
+        </mat-card-content>
+      </mat-card>
     </div>
   `,
   styles: [`
-    .todays-services-container {
-      padding: 24px;
+    .page-container {
+      padding: 32px;
+      max-width: 1400px;
+      margin: 0 auto;
     }
   `]
 })
-export class TodaysServicesComponent {
-}
+export class TodaysServicesComponent {}

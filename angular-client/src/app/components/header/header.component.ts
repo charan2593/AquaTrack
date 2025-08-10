@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { AuthService } from '../../services/auth.service';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatChipsModule } from '@angular/material/chips';
+import { AuthService, User } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -12,88 +14,78 @@ import { AuthService } from '../../services/auth.service';
     CommonModule,
     MatToolbarModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    MatBadgeModule,
+    MatChipsModule
   ],
   template: `
-    <mat-toolbar class="header" data-testid="header">
+    <mat-toolbar class="header" color="primary">
       <div class="header-content">
-        <div class="header-left">
-          <h1 class="page-title" data-testid="text-page-title">
-            Dashboard Overview
-          </h1>
-          <p class="welcome-text" *ngIf="authService.user$ | async as user">
-            Welcome back, {{getUserName(user)}}
+        <div class="page-info">
+          <h1 class="page-title">Dashboard Overview</h1>
+          <p class="welcome-text" *ngIf="user">
+            Welcome back, {{ user.firstName || user.username }}
           </p>
         </div>
-        
-        <div class="header-right">
+
+        <div class="header-actions">
           <!-- Current Date -->
           <div class="date-info">
-            <mat-icon class="date-icon">calendar_today</mat-icon>
-            <span data-testid="text-current-date">{{getCurrentDate()}}</span>
-          </div>
-          
-          <!-- Divider -->
-          <div class="divider"></div>
-          
-          <!-- System Status -->
-          <div class="system-status">
-            <div class="status-indicator online"></div>
-            <span class="status-text" data-testid="text-system-status">
-              System Online
-            </span>
+            <mat-icon>today</mat-icon>
+            <span>{{ getCurrentDate() }}</span>
           </div>
 
-          <!-- User Role Badge -->
-          <div class="divider" *ngIf="authService.user$ | async as user"></div>
-          <div class="user-role" *ngIf="authService.user$ | async as user" data-testid="badge-user-role">
-            {{user.role | titlecase}}
+          <div class="divider"></div>
+
+          <!-- System Status -->
+          <div class="status-info">
+            <div class="status-indicator online"></div>
+            <span class="status-text">System Online</span>
           </div>
+
+          <div class="divider" *ngIf="user?.role"></div>
+
+          <!-- User Role Badge -->
+          <mat-chip-set *ngIf="user?.role">
+            <mat-chip class="role-chip">{{ user.role | titlecase }}</mat-chip>
+          </mat-chip-set>
         </div>
       </div>
     </mat-toolbar>
   `,
   styles: [`
     .header {
-      background: white;
-      color: #333;
-      border-bottom: 1px solid #e0e0e0;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      height: 64px;
-      min-height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .header-content {
-      width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      width: 100%;
       padding: 0 24px;
     }
 
-    .header-left {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .page-title {
+    .page-info h1 {
       margin: 0;
       font-size: 24px;
       font-weight: 600;
-      color: #1e40af;
+      color: white;
     }
 
     .welcome-text {
-      margin: 0;
+      margin: 4px 0 0 0;
       font-size: 14px;
-      color: #666;
+      color: rgba(255, 255, 255, 0.8);
     }
 
-    .header-right {
+    .header-actions {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 20px;
     }
 
     .date-info {
@@ -101,10 +93,10 @@ import { AuthService } from '../../services/auth.service';
       align-items: center;
       gap: 8px;
       font-size: 14px;
-      color: #666;
+      color: rgba(255, 255, 255, 0.9);
     }
 
-    .date-icon {
+    .date-info mat-icon {
       font-size: 18px;
       width: 18px;
       height: 18px;
@@ -113,10 +105,10 @@ import { AuthService } from '../../services/auth.service';
     .divider {
       width: 1px;
       height: 24px;
-      background: #e0e0e0;
+      background: rgba(255, 255, 255, 0.3);
     }
 
-    .system-status {
+    .status-info {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -126,11 +118,16 @@ import { AuthService } from '../../services/auth.service';
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      animation: pulse 2s ease-in-out infinite;
+      animation: pulse 2s infinite;
     }
 
     .status-indicator.online {
       background: #4caf50;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
 
     .status-text {
@@ -139,53 +136,46 @@ import { AuthService } from '../../services/auth.service';
       font-weight: 500;
     }
 
-    .user-role {
-      background: #f5f5f5;
-      color: #666;
-      padding: 4px 12px;
-      border-radius: 16px;
-      font-size: 12px;
+    .role-chip {
+      background: rgba(255, 255, 255, 0.2) !important;
+      color: white !important;
       font-weight: 500;
-      text-transform: capitalize;
-      border: 1px solid #e0e0e0;
     }
 
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.5;
-      }
-    }
-
-    /* Mobile responsiveness */
     @media (max-width: 768px) {
       .header-content {
         padding: 0 16px;
       }
 
-      .page-title {
-        font-size: 20px;
-      }
-
-      .header-right {
-        gap: 8px;
+      .header-actions {
+        gap: 12px;
       }
 
       .date-info,
-      .system-status {
+      .status-info {
         display: none;
       }
+    }
 
-      .divider {
+    @media (max-width: 480px) {
+      .page-info h1 {
+        font-size: 20px;
+      }
+      
+      .welcome-text {
         display: none;
       }
     }
   `]
 })
 export class HeaderComponent {
-  constructor(public authService: AuthService) {}
+  user: User | null = null;
+
+  constructor(private authService: AuthService) {
+    this.authService.user$.subscribe(user => {
+      this.user = user;
+    });
+  }
 
   getCurrentDate(): string {
     return new Date().toLocaleDateString('en-US', {
@@ -193,9 +183,5 @@ export class HeaderComponent {
       month: 'long',
       day: 'numeric'
     });
-  }
-
-  getUserName(user: any): string {
-    return user?.firstName || user?.email || 'User';
   }
 }

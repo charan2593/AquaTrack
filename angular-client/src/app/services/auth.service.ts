@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 
 export interface User {
@@ -10,22 +10,20 @@ export interface User {
   firstName?: string;
   lastName?: string;
   role: 'admin' | 'manager' | 'technician';
-  createdAt: string;
-  updatedAt: string;
 }
 
-export interface LoginRequest {
+export interface LoginCredentials {
   username: string;
   password: string;
 }
 
-export interface RegisterRequest {
+export interface RegisterData {
   username: string;
   password: string;
   email?: string;
   firstName?: string;
   lastName?: string;
-  role: 'admin' | 'manager' | 'technician';
+  role?: string;
 }
 
 @Injectable({
@@ -33,71 +31,43 @@ export interface RegisterRequest {
 })
 export class AuthService {
   private userSubject = new BehaviorSubject<User | null>(null);
-  private isLoadingSubject = new BehaviorSubject<boolean>(false);
-
+  private loadingSubject = new BehaviorSubject<boolean>(true);
+  
   public user$ = this.userSubject.asObservable();
-  public isLoading$ = this.isLoadingSubject.asObservable();
-  public isAuthenticated$ = this.user$.pipe(
-    map(user => !!user)
-  );
+  public isAuthenticated$ = this.user$.pipe(map(user => !!user));
+  public isLoading$ = this.loadingSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    this.initializeAuth();
-  }
-
-  private initializeAuth(): void {
     this.checkAuthStatus().subscribe();
   }
 
   checkAuthStatus(): Observable<boolean> {
-    this.isLoadingSubject.next(true);
-    
     return this.http.get<User>('/api/user').pipe(
       tap(user => {
         this.userSubject.next(user);
-        this.isLoadingSubject.next(false);
+        this.loadingSubject.next(false);
       }),
       map(user => !!user),
-      catchError((error: HttpErrorResponse) => {
+      catchError(() => {
         this.userSubject.next(null);
-        this.isLoadingSubject.next(false);
-        
-        // Don't throw error for 401/403 responses as they indicate unauthenticated state
-        if (error.status === 401 || error.status === 403) {
-          return [false];
-        }
-        
-        return throwError(() => error);
+        this.loadingSubject.next(false);
+        return of(false);
       })
     );
   }
 
-  login(credentials: LoginRequest): Observable<User> {
-    this.isLoadingSubject.next(true);
-    
+  login(credentials: LoginCredentials): Observable<User> {
     return this.http.post<User>('/api/login', credentials).pipe(
       tap(user => {
         this.userSubject.next(user);
-        this.isLoadingSubject.next(false);
-      }),
-      catchError((error: HttpErrorResponse) => {
-        this.isLoadingSubject.next(false);
-        return this.handleError(error);
       })
     );
   }
 
-  register(userData: RegisterRequest): Observable<User> {
-    this.isLoadingSubject.next(true);
-    
-    return this.http.post<User>('/api/register', userData).pipe(
+  register(data: RegisterData): Observable<User> {
+    return this.http.post<User>('/api/register', data).pipe(
       tap(user => {
         this.userSubject.next(user);
-        this.isLoadingSubject.next(false);
-      }),
-      catchError((error: HttpErrorResponse) => {
-        this.isLoadingSubject.next(false);
-        return this.handleError(error);
       })
     );
   }
@@ -106,11 +76,6 @@ export class AuthService {
     return this.http.post<void>('/api/logout', {}).pipe(
       tap(() => {
         this.userSubject.next(null);
-      }),
-      catchError((error: HttpErrorResponse) => {
-        // Even if logout fails on server, clear local state
-        this.userSubject.next(null);
-        return this.handleError(error);
       })
     );
   }
@@ -119,17 +84,7 @@ export class AuthService {
     return this.userSubject.value;
   }
 
-  private handleError(error: HttpErrorResponse): Observable<never> {
-    let errorMessage = 'An error occurred';
-    
-    if (error.error instanceof ErrorEvent) {
-      // Client-side error
-      errorMessage = `Error: ${error.error.message}`;
-    } else {
-      // Server-side error
-      errorMessage = error.error?.message || `Error Code: ${error.status}\nMessage: ${error.message}`;
-    }
-    
-    return throwError(() => ({ error: { message: errorMessage }, ...error }));
+  isAuthenticated(): boolean {
+    return !!this.userSubject.value;
   }
 }

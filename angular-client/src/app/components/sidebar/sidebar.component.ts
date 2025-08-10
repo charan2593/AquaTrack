@@ -1,23 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { LayoutModule } from '@angular/cdk/layout';
-import { Subject } from 'rxjs';
-import { takeUntil, combineLatest } from 'rxjs';
-import { AuthService } from '../../services/auth.service';
-import { SidebarService } from '../../services/sidebar.service';
-
-interface MenuItem {
-  title: string;
-  route: string;
-  icon: string;
-  testId: string;
-}
+import { MatBadgeModule } from '@angular/material/badge';
+import { AuthService, User } from '../../services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -28,503 +16,261 @@ interface MenuItem {
     MatListModule,
     MatIconModule,
     MatButtonModule,
-    MatDividerModule,
-    MatTooltipModule,
-    LayoutModule
+    MatBadgeModule
   ],
   template: `
-    <div class="sidebar-container">
-      <!-- Mobile toggle button -->
-      <button 
-        *ngIf="isMobile"
-        mat-icon-button
-        (click)="toggleSidebar()"
-        class="mobile-toggle"
-        data-testid="button-mobile-toggle">
-        <mat-icon>menu</mat-icon>
-      </button>
-
-      <!-- Mobile overlay -->
-      <div 
-        *ngIf="isMobile && isMobileOpen"
-        class="mobile-overlay"
-        (click)="closeMobileSidebar()">
+    <nav class="sidebar winter-sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <mat-icon>water_drop</mat-icon>
+          <h2>AquaFlow</h2>
+        </div>
+        <div class="user-info" *ngIf="user">
+          <div class="user-avatar">
+            {{ getUserInitials(user) }}
+          </div>
+          <div class="user-details">
+            <p class="user-name">{{ user.firstName || user.username }}</p>
+            <p class="user-role">{{ user.role | titlecase }}</p>
+          </div>
+        </div>
       </div>
 
-      <!-- Sidebar -->
-      <aside 
-        class="sidebar"
-        [class.collapsed]="isCollapsed && !isMobile"
-        [class.mobile-open]="isMobile && isMobileOpen"
-        [class.mobile-closed]="isMobile && !isMobileOpen"
-        data-testid="sidebar">
-        
-        <!-- Desktop toggle button -->
-        <button 
-          *ngIf="!isMobile"
-          mat-icon-button
-          (click)="toggleSidebar()"
-          class="desktop-toggle"
-          data-testid="button-toggle-sidebar">
-          <mat-icon>{{isCollapsed ? 'chevron_right' : 'chevron_left'}}</mat-icon>
-        </button>
-
-        <!-- Logo Section -->
-        <div class="logo-section" [class.collapsed]="isCollapsed && !isMobile">
-          <mat-icon class="logo-icon">water_drop</mat-icon>
-          <span class="logo-text" *ngIf="!isCollapsed || isMobile">AquaFlow</span>
-        </div>
-        
-        <!-- Navigation Menu -->
-        <nav class="nav-menu">
+      <div class="sidebar-content">
+        <mat-nav-list>
           <!-- Dashboard -->
-          <div 
-            class="nav-item"
-            [class.active-route]="isActiveRoute('/')"
-            (click)="navigate('/')"
-            data-testid="nav-dashboard"
-            [matTooltip]="isCollapsed && !isMobile ? 'Dashboard' : ''"
-            matTooltipPosition="right">
-            <mat-icon class="nav-icon">dashboard</mat-icon>
-            <span class="nav-text" *ngIf="!isCollapsed || isMobile">Dashboard</span>
-          </div>
+          <a mat-list-item routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+            <mat-icon matListItemIcon>dashboard</mat-icon>
+            <span matListItemTitle>Dashboard</span>
+          </a>
 
           <!-- Service Management Section -->
-          <div class="section-divider" *ngIf="!isCollapsed || isMobile">
-            <span class="section-title">Service Management</span>
-          </div>
-          
-          <div 
-            *ngFor="let item of serviceMenuItems" 
-            class="nav-item"
-            [class.active-route]="isActiveRoute(item.route)"
-            (click)="navigate(item.route)"
-            [attr.data-testid]="item.testId"
-            [matTooltip]="isCollapsed && !isMobile ? item.title : ''"
-            matTooltipPosition="right">
-            <mat-icon class="nav-icon">{{item.icon}}</mat-icon>
-            <span class="nav-text" *ngIf="!isCollapsed || isMobile">{{item.title}}</span>
+          <div class="nav-section">
+            <h3 class="section-title">Service Management</h3>
+            
+            <a mat-list-item routerLink="/customers" routerLinkActive="active">
+              <mat-icon matListItemIcon>people</mat-icon>
+              <span matListItemTitle>Customers List</span>
+            </a>
+
+            <a mat-list-item routerLink="/todays-services" routerLinkActive="active">
+              <mat-icon matListItemIcon>today</mat-icon>
+              <span matListItemTitle>Today's Services</span>
+              <mat-icon matListItemMeta matBadge="3" matBadgeColor="warn" matBadgeSize="small">notifications</mat-icon>
+            </a>
+
+            <a mat-list-item routerLink="/rent-dues" routerLinkActive="active">
+              <mat-icon matListItemIcon>payment</mat-icon>
+              <span matListItemTitle>Rent Dues</span>
+            </a>
+
+            <a mat-list-item routerLink="/purifier-purchases" routerLinkActive="active">
+              <mat-icon matListItemIcon>shopping_cart</mat-icon>
+              <span matListItemTitle>Purifier Purchases</span>
+            </a>
+
+            <a mat-list-item routerLink="/amc-purchases" routerLinkActive="active">
+              <mat-icon matListItemIcon>receipt_long</mat-icon>
+              <span matListItemTitle>AMC Purchases</span>
+            </a>
           </div>
 
           <!-- Inventory Section -->
-          <div class="section-divider" *ngIf="!isCollapsed || isMobile">
-            <span class="section-title">Inventory</span>
-          </div>
-          
-          <div 
-            class="nav-item"
-            [class.active-route]="isActiveRoute('/inventory')"
-            (click)="navigate('/inventory')"
-            data-testid="nav-inventory"
-            [matTooltip]="isCollapsed && !isMobile ? 'Inventory Dashboard' : ''"
-            matTooltipPosition="right">
-            <mat-icon class="nav-icon">inventory</mat-icon>
-            <span class="nav-text" *ngIf="!isCollapsed || isMobile">Inventory Dashboard</span>
-          </div>
-        </nav>
-
-        <!-- User Section -->
-        <div class="user-section">
-          <div class="user-info" *ngIf="authService.user$ | async as user">
-            <!-- Expanded user info -->
-            <div class="user-details" *ngIf="!isCollapsed || isMobile">
-              <div class="user-avatar">
-                {{getUserInitial(user)}}
-              </div>
-              <div class="user-text">
-                <span class="user-name" data-testid="text-user-name">
-                  {{getUserName(user)}}
-                </span>
-                <span class="user-role" data-testid="text-user-role">
-                  {{user.role | titlecase}}
-                </span>
-              </div>
-            </div>
+          <div class="nav-section">
+            <h3 class="section-title">Inventory</h3>
             
-            <!-- Collapsed user avatar -->
-            <div class="user-avatar-only" *ngIf="isCollapsed && !isMobile">
-              <div class="user-avatar">
-                {{getUserInitial(user)}}
-              </div>
-            </div>
+            <a mat-list-item routerLink="/inventory" routerLinkActive="active">
+              <mat-icon matListItemIcon>inventory_2</mat-icon>
+              <span matListItemTitle>Inventory Management</span>
+            </a>
           </div>
-          
-          <button 
-            mat-button 
-            (click)="logout()"
-            class="logout-button"
-            [class.collapsed]="isCollapsed && !isMobile"
-            data-testid="button-logout"
-            [matTooltip]="isCollapsed && !isMobile ? 'Logout' : ''"
-            matTooltipPosition="right">
-            <mat-icon>logout</mat-icon>
-            <span *ngIf="!isCollapsed || isMobile">Logout</span>
-          </button>
-        </div>
-      </aside>
-    </div>
+        </mat-nav-list>
+      </div>
+
+      <div class="sidebar-footer">
+        <button mat-raised-button color="warn" (click)="logout()" class="logout-button">
+          <mat-icon>logout</mat-icon>
+          Logout
+        </button>
+      </div>
+    </nav>
   `,
   styles: [`
-    .sidebar-container {
-      position: relative;
-    }
-
-    .mobile-toggle {
-      position: fixed;
-      top: 16px;
-      left: 16px;
-      z-index: 1001;
-      background: white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-
-    .mobile-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-      backdrop-filter: blur(4px);
-    }
-
     .sidebar {
-      width: 256px;
+      width: 280px;
       height: 100vh;
-      background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
-      color: white;
-      display: flex;
-      flex-direction: column;
       position: fixed;
       left: 0;
       top: 0;
+      display: flex;
+      flex-direction: column;
       z-index: 1000;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease-in-out;
-      overflow: hidden;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
     }
 
-    .sidebar.collapsed {
-      width: 64px;
+    .sidebar-header {
+      padding: 24px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .sidebar.mobile-closed {
-      transform: translateX(-100%);
-    }
-
-    .sidebar.mobile-open {
-      transform: translateX(0);
-    }
-
-    .desktop-toggle {
-      position: absolute;
-      top: 16px;
-      right: -12px;
-      z-index: 1001;
-      background: white;
-      color: #1e40af;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      width: 24px;
-      height: 24px;
-      line-height: 24px;
-    }
-
-    .desktop-toggle mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
-    }
-
-    .logo-section {
+    .logo {
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.1);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-      min-height: 64px;
+      gap: 12px;
+      margin-bottom: 24px;
     }
 
-    .logo-section.collapsed {
-      justify-content: center;
-      padding: 20px 8px;
-    }
-
-    .logo-icon {
-      color: #60a5fa;
+    .logo mat-icon {
       font-size: 32px;
       width: 32px;
       height: 32px;
-      flex-shrink: 0;
+      color: hsl(var(--winter-accent));
     }
 
-    .logo-text {
+    .logo h2 {
+      margin: 0;
       font-size: 24px;
-      font-weight: bold;
-      margin-left: 12px;
-      color: white;
-      white-space: nowrap;
-    }
-
-    .nav-menu {
-      flex: 1;
-      padding: 16px 0;
-      overflow-y: auto;
-    }
-
-    .section-divider {
-      margin: 16px 0 8px 0;
-    }
-
-    .section-title {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 12px;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 0 16px;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      padding: 12px 16px;
-      margin: 2px 8px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      color: rgba(255, 255, 255, 0.9);
-      min-height: 48px;
-    }
-
-    .sidebar.collapsed .nav-item {
-      justify-content: center;
-      padding: 12px;
-    }
-
-    .nav-item:hover {
-      background: rgba(255, 255, 255, 0.1);
       color: white;
-    }
-
-    .nav-item.active-route {
-      background: rgba(255, 255, 255, 0.15);
-      color: #60a5fa;
-      border-right: 3px solid #60a5fa;
-    }
-
-    .nav-icon {
-      flex-shrink: 0;
-      width: 24px;
-      height: 24px;
-      font-size: 24px;
-    }
-
-    .nav-text {
-      margin-left: 12px;
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-
-    .user-section {
-      padding: 16px;
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .user-info {
-      margin-bottom: 12px;
-    }
-
-    .user-details {
       display: flex;
       align-items: center;
-    }
-
-    .user-avatar-only {
-      display: flex;
-      justify-content: center;
+      gap: 12px;
     }
 
     .user-avatar {
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: #60a5fa;
+      background: hsl(var(--winter-primary));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
-      font-size: 16px;
       color: white;
-      flex-shrink: 0;
+      font-weight: 600;
+      font-size: 14px;
     }
 
-    .user-text {
-      margin-left: 12px;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
+    .user-details {
+      flex: 1;
     }
 
     .user-name {
+      margin: 0;
+      font-size: 14px;
       font-weight: 500;
       color: white;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .user-role {
+      margin: 0;
       font-size: 12px;
       color: rgba(255, 255, 255, 0.7);
     }
 
-    .logout-button {
-      width: 100%;
-      color: rgba(255, 255, 255, 0.9) !important;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      justify-content: flex-start;
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 0;
     }
 
-    .logout-button.collapsed {
-      justify-content: center;
-      min-width: 40px;
-      padding: 8px;
+    .nav-section {
+      margin-bottom: 32px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0 0 8px 20px;
+    }
+
+    .mat-mdc-list-item {
+      color: rgba(255, 255, 255, 0.8) !important;
+      margin: 0 12px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      min-height: 48px !important;
+    }
+
+    .mat-mdc-list-item:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: white !important;
+    }
+
+    .mat-mdc-list-item.active {
+      background: hsl(var(--winter-primary) / 0.2) !important;
+      color: hsl(var(--winter-accent)) !important;
+      border-left: 3px solid hsl(var(--winter-primary));
+    }
+
+    .mat-mdc-list-item .mat-icon {
+      color: inherit;
+    }
+
+    .sidebar-footer {
+      padding: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logout-button {
+      width: 100%;
+      background: rgba(244, 67, 54, 0.1) !important;
+      color: #f44336 !important;
+      border: 1px solid rgba(244, 67, 54, 0.3);
     }
 
     .logout-button:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.5);
+      background: rgba(244, 67, 54, 0.2) !important;
     }
 
-    .logout-button mat-icon {
-      margin-right: 8px;
-    }
-
-    .logout-button.collapsed mat-icon {
-      margin-right: 0;
-    }
-
-    /* Mobile styles */
     @media (max-width: 768px) {
       .sidebar {
-        width: 256px;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
       }
 
-      .desktop-toggle {
-        display: none;
-      }
-    }
-
-    /* Desktop styles */
-    @media (min-width: 769px) {
-      .mobile-toggle {
-        display: none;
+      .sidebar.open {
+        transform: translateX(0);
       }
     }
   `]
 })
-export class SidebarComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
-  
-  isCollapsed = false;
-  isMobileOpen = false;
-  isMobile = false;
-
-  serviceMenuItems: MenuItem[] = [
-    {
-      title: 'Customers List',
-      route: '/customers',
-      icon: 'people',
-      testId: 'nav-customers'
-    },
-    {
-      title: "Today's Services",
-      route: '/todays-services',
-      icon: 'today',
-      testId: 'nav-todays-services'
-    },
-    {
-      title: 'Rent Dues',
-      route: '/rent-dues',
-      icon: 'payments',
-      testId: 'nav-rent-dues'
-    },
-    {
-      title: 'Purifier Purchases',
-      route: '/purifier-purchases',
-      icon: 'shopping_cart',
-      testId: 'nav-purifier-purchases'
-    },
-    {
-      title: 'AMC Purchases',
-      route: '/amc-purchases',
-      icon: 'description',
-      testId: 'nav-amc-purchases'
-    }
-  ];
+export class SidebarComponent {
+  user: User | null = null;
 
   constructor(
-    public authService: AuthService,
-    private router: Router,
-    private sidebarService: SidebarService
-  ) {}
-
-  ngOnInit(): void {
-    // Subscribe to sidebar state changes
-    combineLatest([
-      this.sidebarService.isCollapsed$,
-      this.sidebarService.isMobileOpen$,
-      this.sidebarService.isMobile$
-    ]).pipe(takeUntil(this.destroy$))
-      .subscribe(([isCollapsed, isMobileOpen, isMobile]) => {
-        this.isCollapsed = isCollapsed;
-        this.isMobileOpen = isMobileOpen;
-        this.isMobile = isMobile;
-      });
+    private authService: AuthService,
+    private router: Router
+  ) {
+    this.authService.user$.subscribe(user => {
+      this.user = user;
+    });
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  toggleSidebar(): void {
-    this.sidebarService.toggleSidebar(this.isMobile);
-  }
-
-  closeMobileSidebar(): void {
-    this.sidebarService.closeMobileSidebar();
-  }
-
-  navigate(route: string): void {
-    this.router.navigate([route]);
-    if (this.isMobile) {
-      this.closeMobileSidebar();
+  getUserInitials(user: User): string {
+    if (user.firstName && user.lastName) {
+      return (user.firstName[0] + user.lastName[0]).toUpperCase();
     }
-  }
-
-  isActiveRoute(route: string): boolean {
-    if (route === '/') {
-      return this.router.url === '/';
+    if (user.firstName) {
+      return user.firstName.substring(0, 2).toUpperCase();
     }
-    return this.router.url.startsWith(route);
+    return user.username.substring(0, 2).toUpperCase();
   }
 
-  getUserInitial(user: any): string {
-    return user?.firstName?.charAt(0) || user?.email?.charAt(0) || 'U';
-  }
-
-  getUserName(user: any): string {
-    return user?.firstName || user?.email || 'User';
-  }
-
-  logout(): void {
+  logout() {
     this.authService.logout().subscribe({
       next: () => {
         this.router.navigate(['/auth']);
       },
       error: (error) => {
-        console.error('Logout failed:', error);
+        console.error('Logout error:', error);
+        // Force logout even if API fails
+        this.router.navigate(['/auth']);
       }
     });
   }

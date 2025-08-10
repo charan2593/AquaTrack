@@ -5,8 +5,8 @@ AquaFlow is a comprehensive water purifier service management system built with 
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
-Frontend preference: Angular implementation (requested switch from React to Angular)
-Recent request: Successfully switched to Angular dashboard with Material Design interface
+Frontend preference: React implementation (user expressed disappointment with Angular attempts, prefers working React version)
+Recent feedback: User wants reliable, working React application rather than experimental Angular conversion
 
 # System Architecture
 

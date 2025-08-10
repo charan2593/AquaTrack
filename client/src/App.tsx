@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { SidebarProvider, useSidebar } from "@/contexts/SidebarContext";
 import { ProtectedRoute } from "@/lib/protected-route";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
@@ -16,6 +17,36 @@ import AmcPurchases from "@/pages/amc-purchases";
 import Inventory from "@/pages/inventory";
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
+import { cn } from "@/lib/utils";
+
+function AuthenticatedLayout() {
+  const { getMainContentMargin } = useSidebar();
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Sidebar />
+      <div className={cn(
+        "transition-all duration-300 ease-in-out",
+        getMainContentMargin()
+      )}>
+        <Header />
+        <main className="flex-1 min-h-[calc(100vh-4rem)]">
+          <Switch>
+            <Route path="/" component={Dashboard} />
+            <Route path="/customers" component={Customers} />
+            <Route path="/todays-services" component={TodaysServices} />
+            <Route path="/rent-dues" component={RentDues} />
+            <Route path="/purifier-purchases" component={PurifierPurchases} />
+            <Route path="/amc-purchases" component={AmcPurchases} />
+            <Route path="/inventory" component={Inventory} />
+            <Route path="/auth" component={AuthPage} />
+            <Route component={NotFound} />
+          </Switch>
+        </main>
+      </div>
+    </div>
+  );
+}
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -39,25 +70,9 @@ function Router() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Sidebar />
-      <div className="ml-64">
-        <Header />
-        <main className="flex-1">
-          <Switch>
-            <Route path="/" component={Dashboard} />
-            <Route path="/customers" component={Customers} />
-            <Route path="/todays-services" component={TodaysServices} />
-            <Route path="/rent-dues" component={RentDues} />
-            <Route path="/purifier-purchases" component={PurifierPurchases} />
-            <Route path="/amc-purchases" component={AmcPurchases} />
-            <Route path="/inventory" component={Inventory} />
-            <Route path="/auth" component={AuthPage} />
-            <Route component={NotFound} />
-          </Switch>
-        </main>
-      </div>
-    </div>
+    <SidebarProvider>
+      <AuthenticatedLayout />
+    </SidebarProvider>
   );
 }
 

@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -19,39 +18,22 @@ import {
   ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useSidebar } from "@/contexts/SidebarContext";
 
 export default function Sidebar() {
-  const isMobile = useIsMobile();
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [location] = useLocation();
   const { user, logoutMutation } = useAuth();
-
-  // Set default collapsed state based on screen size
-  useEffect(() => {
-    if (isMobile) {
-      setIsCollapsed(true);
-      setIsMobileOpen(false);
-    }
-  }, [isMobile]);
+  const {
+    isCollapsed,
+    isMobileOpen,
+    isMobile,
+    toggleSidebar,
+    closeMobileSidebar,
+    getSidebarWidth
+  } = useSidebar();
 
   const handleLogout = () => {
     logoutMutation.mutate();
-  };
-
-  const toggleSidebar = () => {
-    if (isMobile) {
-      setIsMobileOpen(!isMobileOpen);
-    } else {
-      setIsCollapsed(!isCollapsed);
-    }
-  };
-
-  const closeMobileSidebar = () => {
-    if (isMobile) {
-      setIsMobileOpen(false);
-    }
   };
 
   const menuItems = [
@@ -116,24 +98,12 @@ export default function Sidebar() {
   };
 
   // Determine sidebar visibility and width
-  const sidebarWidth = isCollapsed ? "w-16" : "w-64";
-  const showSidebar = isMobile ? isMobileOpen : true;
+  const sidebarWidth = getSidebarWidth();
   const sidebarTransform = isMobile && !isMobileOpen ? "-translate-x-full" : "translate-x-0";
 
   return (
     <>
-      {/* Mobile toggle button - always visible on mobile */}
-      {isMobile && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={toggleSidebar}
-          className="fixed top-4 left-4 z-50 bg-white dark:bg-gray-800 shadow-md lg:hidden"
-          data-testid="button-mobile-toggle"
-        >
-          <Menu className="h-4 w-4" />
-        </Button>
-      )}
+
 
       {/* Mobile overlay */}
       {isMobile && isMobileOpen && (
@@ -285,13 +255,6 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Spacer for main content - only on desktop */}
-      {!isMobile && (
-        <div className={cn(
-          "transition-all duration-300 ease-in-out",
-          isCollapsed ? "ml-16" : "ml-64"
-        )} />
-      )}
     </>
   );
 }

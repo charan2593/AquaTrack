@@ -44,9 +44,14 @@ export const customers = pgTable("customers", {
   name: varchar("name").notNull(),
   email: varchar("email"),
   phone: varchar("phone").notNull(),
-  address: text("address").notNull(),
-  serviceType: varchar("service_type").notNull(), // rental, amc, purchase
-  status: varchar("status").notNull().default('active'), // active, inactive, suspended
+  phoneVerified: boolean("phone_verified").notNull().default(false),
+  doorNo: varchar("door_no").notNull(),
+  address1: varchar("address1").notNull(),
+  address2: varchar("address2"),
+  pincode: varchar("pincode").notNull(),
+  productType: varchar("product_type").notNull(), // aqua-fresh-type1, aqua-fresh-type2, fonix
+  serviceType: varchar("service_type").notNull(), // rental, purchase, amc
+  status: varchar("status").notNull().default('active'), // active, inactive
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -137,8 +142,12 @@ export const insertUserSchema = createInsertSchema(users).omit({
 
 export const insertCustomerSchema = createInsertSchema(customers).omit({
   id: true,
+  phoneVerified: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  phone: z.string().regex(/^[6-9]\d{9}$/, "Please enter a valid Indian mobile number"),
+  pincode: z.string().regex(/^\d{6}$/, "Please enter a valid 6-digit pincode"),
 });
 
 export const insertServiceSchema = createInsertSchema(services).omit({

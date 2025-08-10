@@ -9,17 +9,20 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import CustomerStatusChart from "@/components/charts/customer-status-chart";
+import AddCustomerDialog from "@/components/forms/add-customer-dialog";
+import { type Customer } from "@shared/schema";
 
 export default function Customers() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: customers, isLoading } = useQuery({
+  const { data: customers = [], isLoading } = useQuery<Customer[]>({
     queryKey: ["/api/customers"],
   });
 
-  const { data: customerStats } = useQuery({
+  const { data: customerStats = { total: 0, active: 0, inactive: 0 } } = useQuery<{ total: number; active: number; inactive: number }>({
     queryKey: ["/api/customers/stats"],
   });
 
@@ -55,7 +58,7 @@ export default function Customers() {
     },
   });
 
-  const filteredCustomers = customers?.filter((customer: any) =>
+  const filteredCustomers = customers?.filter((customer: Customer) =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     customer.phone.includes(searchTerm)
@@ -111,7 +114,11 @@ export default function Customers() {
             Manage your customer database and view customer statistics
           </p>
         </div>
-        <Button className="bg-primary hover:bg-secondary text-white" data-testid="button-add-customer">
+        <Button 
+          onClick={() => setIsAddDialogOpen(true)}
+          className="bg-primary hover:bg-secondary text-white" 
+          data-testid="button-add-customer"
+        >
           <Plus className="mr-2 h-4 w-4" />
           Add Customer
         </Button>
@@ -136,19 +143,19 @@ export default function Customers() {
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center">
                 <p className="text-2xl font-bold text-gray-900 dark:text-gray-100" data-testid="text-total-customers-stat">
-                  {customerStats?.total || 0}
+                  {customerStats.total}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Total Customers</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-green-600 dark:text-green-400" data-testid="text-active-customers-stat">
-                  {customerStats?.active || 0}
+                  {customerStats.active}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Active</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-red-600 dark:text-red-400" data-testid="text-inactive-customers-stat">
-                  {customerStats?.inactive || 0}
+                  {customerStats.inactive}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Inactive</p>
               </div>
@@ -207,7 +214,7 @@ export default function Customers() {
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                  {filteredCustomers.map((customer: any) => (
+                  {filteredCustomers.map((customer: Customer) => (
                     <tr key={customer.id} data-testid={`row-customer-${customer.id}`}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
@@ -226,11 +233,17 @@ export default function Customers() {
                         <div className="text-sm text-gray-500 dark:text-gray-400" data-testid={`text-customer-email-${customer.id}`}>
                           {customer.email || 'No email'}
                         </div>
+                        <div className="text-xs text-gray-400" data-testid={`text-customer-address-${customer.id}`}>
+                          {customer.doorNo}, {customer.address1}, {customer.pincode}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Badge className={getServiceTypeColor(customer.serviceType)} data-testid={`badge-service-type-${customer.id}`}>
                           {customer.serviceType.charAt(0).toUpperCase() + customer.serviceType.slice(1)}
                         </Badge>
+                        <div className="text-xs text-gray-500 mt-1" data-testid={`text-customer-product-${customer.id}`}>
+                          {customer.productType?.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Badge className={getStatusColor(customer.status)} data-testid={`badge-status-${customer.id}`}>
@@ -259,6 +272,12 @@ export default function Customers() {
           )}
         </CardContent>
       </Card>
+
+      {/* Add Customer Dialog */}
+      <AddCustomerDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+      />
     </div>
   );
 }

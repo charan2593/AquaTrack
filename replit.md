@@ -1,8 +1,6 @@
 # Overview
 
-AquaFlow is a comprehensive water purifier service management system built with React, Express, and MySQL. The application is successfully deployed and operational at manage.purehomewaters.com with full functionality including customer management, service scheduling, role-based authentication, and dashboard analytics. Production deployment completed using Replit's infrastructure with custom subdomain integration successfully configured. Hostinger hosting account provides MySQL database and DNS management, while Replit handles application hosting with subdomain manage.purehomewaters.com pointing from Hostinger DNS to Replit infrastructure. Main domain purehomewaters.com remains unchanged for marketing/business website. The application provides a complete solution for managing water purifier services, customer data, inventory tracking, and business operations. It features a modern web interface with real-time dashboard analytics, customer management, service scheduling, rent collection tracking, and inventory management capabilities.
-
-**Deployment Status (January 2025):** Successfully deployed at https://manage.purehomewaters.com with SSL certificate and custom domain fully operational.
+AquaFlow is a comprehensive water purifier service management system built with React, Express, and PostgreSQL. The application provides a complete solution for managing water purifier services, customer data, inventory tracking, and business operations. It features a modern web interface with real-time dashboard analytics, customer management, service scheduling, rent collection tracking, and inventory management capabilities.
 
 # User Preferences
 
@@ -21,7 +19,7 @@ The server-side follows a RESTful API architecture built with Express.js and Typ
 The backend implements comprehensive CRUD operations for all major entities (customers, services, inventory, purchases) through a well-defined API interface. Error handling is centralized with proper HTTP status codes and error responses. The server includes middleware for request logging, JSON parsing, and authentication verification.
 
 ## Data Storage Solutions
-MySQL (hosted on Hostinger) serves as the primary database with connection string mysql://u866935527_phw_2025:password@82.25.121.32:3306/u866935527_purehomewaters. The database is fully operational with all tables created and tested. User authentication, customer management, service scheduling, and inventory tracking are all functional with real data operations confirmed. Drizzle ORM provides type-safe database interactions with automatic TypeScript inference from the schema definitions. The database schema includes tables for users, customers, services, rent dues, purchases, inventory items, and session storage.
+PostgreSQL serves as the primary database with separate development and production environments for data isolation and safe development practices. Drizzle ORM provides type-safe database interactions with automatic TypeScript inference from the schema definitions. The database schema includes tables for users, customers, services, rent dues, purchases, inventory items, and session storage.
 
 Database migrations are managed through Drizzle Kit with environment-aware configuration. Connection pooling is implemented using Neon's serverless PostgreSQL driver with optimized settings per environment (dev: 1-5 connections, prod: 2-10 connections). The system automatically validates environment configuration on startup and provides comprehensive logging.
 

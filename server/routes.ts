@@ -126,10 +126,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied. Service boys have read-only access to services." });
       }
       
-      const serviceData = insertServiceSchema.parse({
-        ...req.body,
-        scheduledDate: new Date(req.body.scheduledDate)
-      });
+      const serviceData = insertServiceSchema.parse(req.body);
       const service = await storage.createService(serviceData);
       res.status(201).json(service);
     } catch (error) {
@@ -176,11 +173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/rent-dues/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const rentDueData = insertRentDueSchema.partial().parse({
-        ...req.body,
-        dueDate: req.body.dueDate ? new Date(req.body.dueDate) : undefined,
-        paidDate: req.body.paidDate ? new Date(req.body.paidDate) : undefined
-      });
+      const rentDueData = insertRentDueSchema.partial().parse(req.body);
       const rentDue = await storage.updateRentDue(id, rentDueData);
       res.json(rentDue);
     } catch (error) {
@@ -216,10 +209,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied. Service boys cannot create purifier purchases." });
       }
       
-      const purchaseData = insertPurifierPurchaseSchema.parse({
-        ...req.body,
-        purchaseDate: new Date(req.body.purchaseDate)
-      });
+      const purchaseData = insertPurifierPurchaseSchema.parse(req.body);
       const purchase = await storage.createPurifierPurchase(purchaseData);
       res.status(201).json(purchase);
     } catch (error) {
@@ -254,12 +244,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied. Service boys cannot create AMC purchases." });
       }
       
-      const purchaseData = insertAmcPurchaseSchema.parse({
-        ...req.body,
-        startDate: new Date(req.body.startDate),
-        endDate: new Date(req.body.endDate),
-        packageName: req.body.planName // Map planName to packageName
-      });
+      const purchaseData = insertAmcPurchaseSchema.parse(req.body);
       const purchase = await storage.createAmcPurchase(purchaseData);
       res.status(201).json(purchase);
     } catch (error) {

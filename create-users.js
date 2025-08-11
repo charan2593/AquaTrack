@@ -53,7 +53,7 @@ async function createUsers() {
     for (const user of users) {
       const id = crypto.randomUUID();
       await pool.execute(
-        'INSERT INTO users (id, mobile, password, firstName, lastName, email, role, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())',
+        'INSERT INTO users (id, mobile, password, firstName, lastName, email, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
         [id, user.mobile, user.password, user.firstName, user.lastName, user.email, user.role]
       );
       console.log(`✅ Created ${user.role}: ${user.mobile}`);

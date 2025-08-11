@@ -16,11 +16,11 @@
 3. **Environment Configuration:**
    Create a `.env` file in the root directory with:
    
-   **Option A: Use Hostinger MySQL Database (Recommended for your own data)**
+   **Option A: Use Hostinger MySQL Database (Your Setup)**
    ```env
    NODE_ENV=development
    PORT=3001
-   DATABASE_URL=mysql://username:password@hostname:port/database_name
+   DATABASE_URL=mysql://u866935527_phw_2025:your_password@82.25.121.32:3306/u866935527_purehomewaters
    ```
    
    **Option B: Use Hostinger PostgreSQL Database**

@@ -32,7 +32,7 @@ export function getDatabaseConfig(): DatabaseConfig {
       console.warn('[Warning] PRODUCTION_SESSION_SECRET not set, using fallback');
     }
   } else {
-    // Development: Use development-specific environment variables
+    // Development: Try DEV_DATABASE_URL first, fallback to production DATABASE_URL
     databaseUrl = process.env.DEV_DATABASE_URL || process.env.DATABASE_URL || '';
     sessionSecret = process.env.DEV_SESSION_SECRET || process.env.SESSION_SECRET || 'aquaflow-dev-session-secret-key';
     
@@ -40,8 +40,15 @@ export function getDatabaseConfig(): DatabaseConfig {
       console.error('DEV_DATABASE_URL or DATABASE_URL not found in environment variables');
       throw new Error(
         'DEV_DATABASE_URL or DATABASE_URL must be set for development environment. ' +
-        'Please add your Hostinger development database connection string.'
+        'Please add your database connection string.'
       );
+    }
+
+    // Log which database is being used in development
+    if (process.env.DEV_DATABASE_URL) {
+      console.log('[Database] Using separate development database');
+    } else if (process.env.DATABASE_URL) {
+      console.log('[Database] Using shared database for development (production database)');
     }
   }
 

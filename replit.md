@@ -19,9 +19,13 @@ The server-side follows a RESTful API architecture built with Express.js and Typ
 The backend implements comprehensive CRUD operations for all major entities (customers, services, inventory, purchases) through a well-defined API interface. Error handling is centralized with proper HTTP status codes and error responses. The server includes middleware for request logging, JSON parsing, and authentication verification.
 
 ## Data Storage Solutions
-PostgreSQL serves as the primary database with separate development and production environments for data isolation and safe development practices. Drizzle ORM provides type-safe database interactions with automatic TypeScript inference from the schema definitions. The database schema includes tables for users, customers, services, rent dues, purchases, inventory items, and session storage.
+MySQL serves as the primary database hosted on Hostinger with separate development and production environments for data isolation and safe development practices. Drizzle ORM provides type-safe database interactions with automatic TypeScript inference from the schema definitions. The database schema includes tables for users, customers, services, rent dues, purchases, inventory items, and session storage.
 
-Database migrations are managed through Drizzle Kit with environment-aware configuration. Connection pooling is implemented using Neon's serverless PostgreSQL driver with optimized settings per environment (dev: 1-5 connections, prod: 2-10 connections). The system automatically validates environment configuration on startup and provides comprehensive logging.
+Database migrations are managed through Drizzle Kit with environment-aware configuration. Connection pooling is implemented using MySQL2 driver with optimized settings per environment (dev: 1-5 connections, prod: 2-10 connections). The system automatically validates environment configuration on startup and provides comprehensive logging.
+
+**Database Configuration:**
+- **Development:** u866935527_dev_phw (Hostinger MySQL) - Used in Replit development
+- **Production:** u866935527_purehomewaters (Hostinger MySQL) - Used for deployment
 
 ## Authentication and Authorization
 The application implements role-based authentication using mobile number/password credentials with scrypt hashing for enhanced security. User sessions are stored in PostgreSQL using connect-pg-simple, providing persistent session management. The system supports multiple user roles (admin, manager, service boy) with comprehensive role-based access controls:

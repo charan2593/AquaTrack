@@ -25,7 +25,12 @@ Database migrations are managed through Drizzle Kit with environment-aware confi
 
 **Database Configuration:**
 - **Development:** u866935527_dev_phw (Hostinger MySQL) - Used in Replit development with complete schema and initial users
-- **Production:** u866935527_purehomewaters (Hostinger MySQL) - Used for deployment
+- **Production:** u866935527_purehomewaters (Hostinger MySQL) - Used for deployment via PRODUCTION_DATABASE_URL
+
+**Environment Variable Strategy:**
+- DEV_DATABASE_URL → Development database (Replit development)
+- PRODUCTION_DATABASE_URL → Production database (Hostinger deployment)
+- Automatic environment detection ensures correct database usage
 
 ## Authentication and Authorization
 The application implements role-based authentication using mobile number/password credentials with scrypt hashing for enhanced security. User sessions are stored in PostgreSQL using connect-pg-simple, providing persistent session management. The system supports multiple user roles (admin, manager, service boy) with comprehensive role-based access controls:

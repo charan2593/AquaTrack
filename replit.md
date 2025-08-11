@@ -7,7 +7,6 @@ AquaFlow is a comprehensive water purifier service management system built with 
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
-Approval required: Always ask for approval before making any code changes or file modifications.
 
 # System Architecture
 

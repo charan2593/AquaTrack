@@ -3,11 +3,12 @@ import { drizzle } from 'drizzle-orm/neon-serverless';
 import { drizzle as drizzleMysql } from 'drizzle-orm/mysql2';
 import { createPool } from 'mysql2/promise';
 import ws from "ws";
-import * as schema from "@shared/schema";
 import { getDatabaseConfig, validateEnvironment } from './config/database.js';
 
-// Only configure neonConfig for Neon databases
+// Get database configuration for current environment
 const dbConfig = getDatabaseConfig();
+
+// Only configure neonConfig for Neon databases
 if (dbConfig.databaseUrl.includes('neon.tech')) {
   neonConfig.webSocketConstructor = ws;
 }
@@ -21,30 +22,40 @@ console.log(`[Database] Initializing ${dbConfig.environment} database connection
 let pool: any;
 let db: any;
 
-if (dbConfig.databaseUrl.startsWith('mysql://')) {
-  // MySQL Database (Hostinger)
-  console.log('[Database] Configuring MySQL connection for Hostinger');
-  pool = createPool(dbConfig.databaseUrl);
-  db = drizzleMysql(pool, { schema, mode: 'default' });
-} else {
-  // PostgreSQL Database (Neon or others)
-  const poolConfig: any = { 
-    connectionString: dbConfig.databaseUrl,
-    ...dbConfig.connectionPool
-  };
-
-  // Handle SSL configuration for PostgreSQL
-  if (dbConfig.databaseUrl.includes('neon.tech')) {
-    poolConfig.ssl = { rejectUnauthorized: false };
-    console.log('[Database] Configuring PostgreSQL connection for Neon (SSL enabled)');
+async function initializeDatabase() {
+  if (dbConfig.databaseUrl.startsWith('mysql://')) {
+    // MySQL Database (Hostinger)
+    console.log('[Database] Configuring MySQL connection for Hostinger');
+    const mysqlSchema = await import("@shared/mysql-schema");
+    pool = createPool(dbConfig.databaseUrl);
+    db = drizzleMysql(pool, { schema: mysqlSchema, mode: 'default' });
   } else {
-    poolConfig.ssl = { rejectUnauthorized: false };
-    console.log('[Database] Configuring PostgreSQL connection (SSL flexible)');
-  }
+    // PostgreSQL Database (Neon or others)
+    const pgSchema = await import("@shared/schema");
+    const poolConfig: any = { 
+      connectionString: dbConfig.databaseUrl,
+      ...dbConfig.connectionPool
+    };
 
-  pool = new Pool(poolConfig);
-  db = drizzle({ client: pool, schema });
+    // Handle SSL configuration for PostgreSQL
+    if (dbConfig.databaseUrl.includes('neon.tech')) {
+      poolConfig.ssl = { rejectUnauthorized: false };
+      console.log('[Database] Configuring PostgreSQL connection for Neon (SSL enabled)');
+    } else {
+      poolConfig.ssl = { rejectUnauthorized: false };
+      console.log('[Database] Configuring PostgreSQL connection (SSL flexible)');
+    }
+
+    pool = new Pool(poolConfig);
+    db = drizzle({ client: pool, schema: pgSchema });
+  }
+  return { pool, db };
 }
+
+// Initialize database connection
+const { pool: poolInstance, db: dbInstance } = await initializeDatabase();
+pool = poolInstance;
+db = dbInstance;
 
 export { pool, db };
 

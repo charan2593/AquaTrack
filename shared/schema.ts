@@ -11,6 +11,18 @@ import {
   boolean,
   date,
 } from "drizzle-orm/pg-core";
+import {
+  mysqlTable,
+  varchar as mysqlVarchar,
+  text as mysqlText,
+  int as mysqlInt,
+  decimal as mysqlDecimal,
+  boolean as mysqlBoolean,
+  date as mysqlDate,
+  timestamp as mysqlTimestamp,
+  json as mysqlJson,
+  index as mysqlIndex,
+} from "drizzle-orm/mysql-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 

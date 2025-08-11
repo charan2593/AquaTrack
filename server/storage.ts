@@ -1,3 +1,4 @@
+// Import types from MySQL schema (compatible with both)
 import {
   users,
   customers,
@@ -22,7 +23,7 @@ import {
   type InventoryItem,
   type InsertInventoryItem,
   type InventoryCategory,
-} from "@shared/schema";
+} from "@shared/mysql-schema";
 import { db } from "./db";
 import { eq, and, desc, sql, gte, lte } from "drizzle-orm";
 import { hashPassword } from "./auth";
@@ -173,7 +174,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(services)
-      .where(eq(services.scheduledDate, today))
+      .where(sql`DATE(${services.scheduledDate}) = ${today}`)
       .orderBy(services.scheduledTime);
   }
 
@@ -201,7 +202,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(rentDues)
-      .where(and(eq(rentDues.dueDate, today), eq(rentDues.status, 'pending')))
+      .where(and(sql`DATE(${rentDues.dueDate}) = ${today}`, eq(rentDues.status, 'pending')))
       .orderBy(rentDues.dueDate);
   }
 
@@ -316,7 +317,7 @@ export class DatabaseStorage implements IStorage {
     
     const [customersResult, servicesResult, duesResult, inventoryResult] = await Promise.all([
       db.select({ count: sql<number>`count(*)` }).from(customers),
-      db.select({ count: sql<number>`count(*)` }).from(services).where(eq(services.scheduledDate, today)),
+      db.select({ count: sql<number>`count(*)` }).from(services).where(sql`DATE(${services.scheduledDate}) = ${today}`),
       db.select({ count: sql<number>`count(*)` }).from(rentDues).where(eq(rentDues.status, 'pending')),
       db.select({ count: sql<number>`count(*)` }).from(inventoryItems),
     ]);

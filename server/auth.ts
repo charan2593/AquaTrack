@@ -3,6 +3,9 @@ import { Strategy as LocalStrategy } from "passport-local";
 import { Express } from "express";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
+// @ts-ignore - express-mysql-session doesn't have types
+import MySQLStore from "express-mysql-session";
+import { createPool } from 'mysql2/promise';
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
@@ -46,13 +49,36 @@ export function setupAuth(app: Express) {
   
   console.log(`[Auth] Setting up authentication for ${dbConfig.environment} environment`);
   
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: dbConfig.databaseUrl,
-    createTableIfMissing: true,
-    ttl: sessionTtl,
-    tableName: "sessions",
-  });
+  let sessionStore: session.Store;
+  
+  if (dbConfig.databaseUrl.startsWith('mysql://')) {
+    // MySQL session store
+    const MySQLStoreSession = MySQLStore(session);
+    const mysqlPool = createPool(dbConfig.databaseUrl);
+    sessionStore = new MySQLStoreSession({
+      expiration: sessionTtl,
+      createDatabaseTable: true,
+      schema: {
+        tableName: 'sessions',
+        columnNames: {
+          session_id: 'session_id',
+          expires: 'expires',
+          data: 'data'
+        }
+      }
+    }, mysqlPool);
+    console.log('[Auth] Using MySQL session store');
+  } else {
+    // PostgreSQL session store
+    const pgStore = connectPg(session);
+    sessionStore = new pgStore({
+      conString: dbConfig.databaseUrl,
+      createTableIfMissing: true,
+      ttl: sessionTtl,
+      tableName: "sessions",
+    });
+    console.log('[Auth] Using PostgreSQL session store');
+  }
 
   const sessionSettings: session.SessionOptions = {
     secret: dbConfig.sessionSecret,

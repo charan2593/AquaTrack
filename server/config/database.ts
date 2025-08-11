@@ -31,8 +31,16 @@ export function getDatabaseConfig(): DatabaseConfig {
       console.warn('[Warning] PRODUCTION_SESSION_SECRET not set, using fallback');
     }
   } else {
-    // For development: Use DATABASE_URL from .env or fallback to Neon
-    databaseUrl = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_eF4ZaH7sMqgp@ep-polished-math-af7yzbh8.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require';
+    // For development: Use Replit's PostgreSQL database (ignore custom DATABASE_URL if it's MySQL)
+    const customDbUrl = process.env.DATABASE_URL || '';
+    if (customDbUrl.startsWith('mysql://')) {
+      console.log('[Database] Ignoring MySQL DATABASE_URL, using Replit PostgreSQL instead');
+      databaseUrl = process.env.PGDATABASE ? 
+        `postgresql://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}?sslmode=require` :
+        'postgresql://neondb_owner:npg_eF4ZaH7sMqgp@ep-polished-math-af7yzbh8.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require';
+    } else {
+      databaseUrl = customDbUrl || 'postgresql://neondb_owner:npg_eF4ZaH7sMqgp@ep-polished-math-af7yzbh8.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require';
+    }
     sessionSecret = process.env.SESSION_SECRET || 'aquaflow-dev-session-secret-key-' + Math.random().toString(36).substring(2, 15);
     
     if (!databaseUrl) {

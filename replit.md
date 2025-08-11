@@ -24,7 +24,7 @@ MySQL serves as the primary database hosted on Hostinger with separate developme
 Database migrations are managed through Drizzle Kit with environment-aware configuration. Connection pooling is implemented using MySQL2 driver with optimized settings per environment (dev: 1-5 connections, prod: 2-10 connections). The system automatically validates environment configuration on startup and provides comprehensive logging.
 
 **Database Configuration:**
-- **Development:** u866935527_dev_phw (Hostinger MySQL) - Used in Replit development
+- **Development:** u866935527_dev_phw (Hostinger MySQL) - Used in Replit development with complete schema and initial users
 - **Production:** u866935527_purehomewaters (Hostinger MySQL) - Used for deployment
 
 ## Authentication and Authorization

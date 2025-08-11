@@ -27,6 +27,7 @@ import {
 import { db } from "./db";
 import { eq, and, desc, sql, gte, lte } from "drizzle-orm";
 import { hashPassword } from "./auth";
+import { randomUUID } from "crypto";
 
 export interface IStorage {
   // User operations
@@ -147,16 +148,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCustomer(customer: InsertCustomer): Promise<Customer> {
-    const [newCustomer] = await db.insert(customers).values(customer).returning();
-    return newCustomer;
+    const id = randomUUID();
+    const customerWithId = { ...customer, id };
+    await db.insert(customers).values(customerWithId);
+    return customerWithId as Customer;
   }
 
   async updateCustomer(id: string, customer: Partial<InsertCustomer>): Promise<Customer> {
-    const [updatedCustomer] = await db
+    await db
       .update(customers)
       .set({ ...customer, updatedAt: new Date() })
-      .where(eq(customers.id, id))
-      .returning();
+      .where(eq(customers.id, id));
+    
+    const [updatedCustomer] = await db.select().from(customers).where(eq(customers.id, id));
     return updatedCustomer;
   }
 
@@ -179,8 +183,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createService(service: InsertService): Promise<Service> {
-    const [newService] = await db.insert(services).values(service).returning();
-    return newService;
+    const id = randomUUID();
+    const serviceWithId = { ...service, id };
+    await db.insert(services).values(serviceWithId);
+    return serviceWithId as Service;
   }
 
   async updateService(id: string, service: Partial<InsertService>): Promise<Service> {

@@ -43,9 +43,35 @@ You should see:
 
 ## First Time Setup
 If this is your first time:
-1. Make sure you have `.env` file with your MySQL DATABASE_URL
-2. Run the database migration: `npx drizzle-kit push --config=drizzle.mysql.config.ts`
-3. Create initial users by inserting them manually in your MySQL database
+
+### 1. Create .env file with your MySQL database:
+```env
+NODE_ENV=development
+PORT=3001
+DATABASE_URL=mysql://u866935527_phw_2025:your_password@82.25.121.32:3306/u866935527_purehomewaters
+```
+
+### 2. Run database migration:
+```cmd
+npx drizzle-kit push --config=drizzle.mysql.config.ts
+```
+
+### 3. Create initial users in MySQL:
+Open MySQL command line or phpMyAdmin and run:
+```sql
+-- Insert Admin User
+INSERT INTO users (id, mobile, password, firstName, lastName, email, role, createdAt, updatedAt) 
+VALUES (UUID(), '8500095021', '$2a$10$hashedpassword.salt', 'Admin', 'User', 'admin@aquaflow.com', 'admin', NOW(), NOW());
+
+-- Insert Manager User  
+INSERT INTO users (id, mobile, password, firstName, lastName, email, role, createdAt, updatedAt)
+VALUES (UUID(), '9999999999', '$2a$10$hashedpassword.salt', 'Manager', 'User', 'manager@aquaflow.com', 'manager', NOW(), NOW());
+
+-- Insert Service Boy
+INSERT INTO users (id, mobile, password, firstName, lastName, email, role, createdAt, updatedAt)
+VALUES (UUID(), '7777777777', '$2a$10$hashedpassword.salt', 'Service', 'Boy', 'service@aquaflow.com', 'technician', NOW(), NOW());
+```
+*Note: You'll need to generate proper password hashes. For testing, use the password 'password'*
 
 ## Troubleshooting
 - **NODE_ENV error:** Use the manual commands above

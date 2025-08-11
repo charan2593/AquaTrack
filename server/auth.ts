@@ -199,7 +199,7 @@ export function setupAuth(app: Express) {
     const user = req.user as SelectUser;
     res.json({
       id: user.id,
-      username: user.username,
+      mobile: user.mobile,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,

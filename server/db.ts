@@ -27,8 +27,9 @@ async function initializeDatabase() {
     // MySQL Database (Hostinger)
     console.log('[Database] Configuring MySQL connection for Hostinger');
     const mysqlSchema = await import("@shared/mysql-schema");
-    pool = createPool(dbConfig.databaseUrl);
-    db = drizzleMysql(pool, { schema: mysqlSchema, mode: 'default' });
+    const mysqlPool = createPool(dbConfig.databaseUrl);
+    const mysqlDb = drizzleMysql(mysqlPool, { schema: mysqlSchema, mode: 'default' });
+    return { pool: mysqlPool, db: mysqlDb };
   } else {
     // PostgreSQL Database (Neon or others)
     const pgSchema = await import("@shared/schema");
@@ -46,16 +47,21 @@ async function initializeDatabase() {
       console.log('[Database] Configuring PostgreSQL connection (SSL flexible)');
     }
 
-    pool = new Pool(poolConfig);
-    db = drizzle({ client: pool, schema: pgSchema });
+    const pgPool = new Pool(poolConfig);
+    const pgDb = drizzle({ client: pgPool, schema: pgSchema });
+    return { pool: pgPool, db: pgDb };
   }
-  return { pool, db };
 }
 
 // Initialize database connection
-const { pool: poolInstance, db: dbInstance } = await initializeDatabase();
-pool = poolInstance;
-db = dbInstance;
+initializeDatabase().then(({ pool: poolInstance, db: dbInstance }) => {
+  pool = poolInstance;
+  db = dbInstance;
+  console.log('[Database] Connection initialized successfully');
+}).catch(error => {
+  console.error('[Database] Failed to initialize connection:', error);
+  process.exit(1);
+});
 
 export { pool, db };
 

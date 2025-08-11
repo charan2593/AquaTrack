@@ -1,6 +1,6 @@
 # Overview
 
-AquaFlow is a comprehensive water purifier service management system built with React, Express, and MySQL. The application is deployment-ready with full functionality tested and working, including customer management, service scheduling, role-based authentication, and dashboard analytics. Ready for production deployment using Replit's infrastructure with custom domain integration. The application provides a complete solution for managing water purifier services, customer data, inventory tracking, and business operations. It features a modern web interface with real-time dashboard analytics, customer management, service scheduling, rent collection tracking, and inventory management capabilities.
+AquaFlow is a comprehensive water purifier service management system built with React, Express, and MySQL. The application is deployment-ready with full functionality tested and working, including customer management, service scheduling, role-based authentication, and dashboard analytics. Ready for production deployment using Replit's infrastructure with custom subdomain integration for professional business use. The application provides a complete solution for managing water purifier services, customer data, inventory tracking, and business operations. It features a modern web interface with real-time dashboard analytics, customer management, service scheduling, rent collection tracking, and inventory management capabilities.
 
 # User Preferences
 

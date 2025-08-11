@@ -17,29 +17,30 @@ export function getDatabaseConfig(): DatabaseConfig {
   let sessionSecret: string;
 
   if (environment === 'production') {
+    // Production: Use production-specific environment variables
     databaseUrl = process.env.PRODUCTION_DATABASE_URL || process.env.DATABASE_URL || '';
     sessionSecret = process.env.PRODUCTION_SESSION_SECRET || process.env.SESSION_SECRET || 'production-secret-key';
     
     if (!databaseUrl) {
       throw new Error(
-        'PRODUCTION_DATABASE_URL must be set for production environment. ' +
-        'Please provide this environment variable.'
+        'PRODUCTION_DATABASE_URL or DATABASE_URL must be set for production environment. ' +
+        'Please provide the production database connection string.'
       );
     }
     
-    if (!process.env.PRODUCTION_SESSION_SECRET) {
+    if (!process.env.PRODUCTION_SESSION_SECRET && !process.env.SESSION_SECRET) {
       console.warn('[Warning] PRODUCTION_SESSION_SECRET not set, using fallback');
     }
   } else {
-    // For development: Use DATABASE_URL from .env or fallback to Neon
-    databaseUrl = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_eF4ZaH7sMqgp@ep-polished-math-af7yzbh8.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require';
-    sessionSecret = process.env.SESSION_SECRET || 'aquaflow-dev-session-secret-key-' + Math.random().toString(36).substring(2, 15);
+    // Development: Use development-specific environment variables
+    databaseUrl = process.env.DEV_DATABASE_URL || process.env.DATABASE_URL || '';
+    sessionSecret = process.env.DEV_SESSION_SECRET || process.env.SESSION_SECRET || 'aquaflow-dev-session-secret-key';
     
     if (!databaseUrl) {
-      console.error('DATABASE_URL not found in environment variables');
+      console.error('DEV_DATABASE_URL or DATABASE_URL not found in environment variables');
       throw new Error(
-        'DATABASE_URL must be set for development environment. ' +
-        'Please add DATABASE_URL to your .env file with your Hostinger database connection string.'
+        'DEV_DATABASE_URL or DATABASE_URL must be set for development environment. ' +
+        'Please add your Hostinger development database connection string.'
       );
     }
   }
@@ -99,6 +100,11 @@ export function validateEnvironment(): void {
     // Additional production checks
     if (config.sessionSecret === 'production-secret-key') {
       console.warn('[Security Warning] Using default session secret in production!');
+    }
+  } else {
+    // Development environment checks
+    if (!process.env.DEV_DATABASE_URL && !process.env.DATABASE_URL) {
+      console.warn('[Development Warning] Consider using DEV_DATABASE_URL for clearer separation');
     }
   }
   
